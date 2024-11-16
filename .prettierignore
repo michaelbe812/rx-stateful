@@ -1,0 +1,10 @@
+# Add files here to ignore them from prettier formatting
+
+/dist
+/coverage
+
+.angular
+
+/.nx/cache
+
+/libs/rx-stateful/src/lib/rx-stateful-reworked.spec.ts
