@@ -9,7 +9,6 @@ import {MatTableDataSource, MatTableModule} from "@angular/material/table";
 import {Todo} from "../types";
 import {rxStateful$, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
 import { DataSource } from '@angular/cdk/collections';
-import {RxHooks$} from "@angular-kit/rx-hooks";
 import {MatButtonModule} from "@angular/material/button";
 import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
 import {MatListModule} from "@angular/material/list";
@@ -73,8 +72,7 @@ import {MatCardModule} from "@angular/material/card";
     </mat-card>
     </div>
 `,
-  styles: [''],
-  hostDirectives: [RxHooks$]
+  styles: ['']
 })
 export class DemoPaginationComponent   {
   code = `
@@ -98,7 +96,6 @@ export class DemoPaginationComponent   {
     }
   )
   `
-  private readonly hooks$ = inject(RxHooks$)
   private readonly http = inject(HttpClient)
   readonly refresh$$ = new Subject<null>()
   readonly page$$ = new BehaviorSubject(0)
