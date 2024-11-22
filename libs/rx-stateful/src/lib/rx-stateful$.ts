@@ -57,7 +57,7 @@ import { withRefetchOnTrigger } from './refetch-strategies/refetch-on-trigger.st
  *
  * @param source$ - The source$ to enhance with additional state information.
  */
-export function rxStateful$<T, E = unknown>(source$: Observable<T>): RxStatefulRequest<T, E>;
+export function rxStateful$<T, E = unknown>(source$: Observable<T>): Observable< RxStateful<T, E>>;
 /**
  * @publicApi
  *
@@ -68,7 +68,7 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>): RxStatefulR
  * @param source$ - The source$ to enhance with additional state information.
  * @param config - Configuration for rxStateful$.
  */
-export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T, E>): RxStatefulRequest<T, E>;
+export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T, E>): Observable< RxStateful<T, E>>;
 /**
  * @publicApi
  *
@@ -78,15 +78,15 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxSt
  * @param sourceFn$
  * @param sourceTriggerConfig
  */
-export function rxStateful$<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<T>, sourceTriggerConfig: RxStatefulSourceTriggerConfig<T,A, E>): RxStatefulRequest<T, E>;
+export function rxStateful$<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<T>, sourceTriggerConfig: RxStatefulSourceTriggerConfig<T,A, E>): Observable< RxStateful<T, E>>;
 
 
 export function rxStateful$<T,A, E = unknown>(
     sourceOrSourceFn$: Observable<T> | ((arg: A) => Observable<T>),
     config?: RxStatefulConfig<T, E> | RxStatefulSourceTriggerConfig<T,A,E>,
-): RxStatefulRequest<T, E> {
+): Observable< RxStateful<T, E>> {
     // Create internal refresh subject
-    const refreshSubject = new Subject<void>();
+
 
     /**
      * Merge default config with user provided config
@@ -96,20 +96,13 @@ export function rxStateful$<T,A, E = unknown>(
         keepErrorOnRefresh: false,
         suspenseThresholdMs: 0,
         suspenseTimeMs: 0,
-        ...config,
-        refetchStrategies: [
-          withRefetchOnTrigger(refreshSubject),
-          ...(Array.isArray(config?.refetchStrategies) ? config.refetchStrategies : config?.refetchStrategies ? [config.refetchStrategies] : [])
-        ]
+        ...config
     };
 
     const state$ = createState$<T,A, E>(sourceOrSourceFn$, mergedConfig);
     const rxStateful = createRxStateful<T, E>(state$, mergedConfig);
 
-    return {
-        value$: () => rxStateful,
-        refresh: () => refreshSubject.next()
-    };
+    return rxStateful
 }
 
 /**
@@ -117,7 +110,7 @@ export function rxStateful$<T,A, E = unknown>(
  * @description
  * helper function to create the rxStateful$ observable
  */
-function createState$<T,A, E>(
+export function createState$<T,A, E>(
     sourceOrSourceFn$: Observable<T> | ((arg: A) => Observable<T>),
     mergedConfig: RxStatefulConfig<T, E> | RxStatefulSourceTriggerConfig<T,A,E>,
 ) {
