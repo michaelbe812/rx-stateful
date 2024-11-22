@@ -2,6 +2,8 @@ import {Observable, Subject} from 'rxjs';
 import {RxStatefulAccumulationFn} from "./accumulation-fn";
 import {RefetchStrategy} from "../refetch-strategies/refetch-strategy";
 
+
+
 /**
  * @publicApi
  *
@@ -51,12 +53,6 @@ export interface InternalRxState<T, E = unknown> {
  * rxStateful$(source$, {keepValueOnRefresh: true})
  */
 export interface RxStatefulConfig<T, E = unknown> {
-  /**
-   * Trigger to refresh the source$.
-   * @deprecated use refetchStrategies instead
-   * Will be removed in version 2 or 3.
-   */
-  refreshTrigger$?: Subject<any>;
   /**
    * One or multiple Trigger to refresh the source$.
    */
@@ -113,4 +109,22 @@ export type RxStatefulSourceTriggerConfig<T,A, E = unknown> = RxStatefulConfig<T
    *
    */
   sourceTriggerConfig: SourceTriggerConfig<A>
+}
+
+/**
+ * @publicApi
+ *
+ * @description
+ * Interface for the stateful request object returned by rxStateful$
+ */
+export interface RxStatefulRequest<T, E = unknown> {
+  /**
+   * Observable that emits the current state including value, error, and loading states
+   */
+  value$: () => Observable<RxStateful<T, E>>;
+
+  /**
+   * Function to manually trigger a refresh of the source observable
+   */
+  refresh: () => void;
 }

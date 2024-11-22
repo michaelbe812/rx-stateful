@@ -20,7 +20,7 @@ describe(rxStateful$.name, () => {
 
           const expected = 's';
 
-          expectObservable(source$).toBe(
+          expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
               s: {
@@ -45,9 +45,12 @@ describe(rxStateful$.name, () => {
             const s$ = cold('-a|', { a: 1 });
             const refresh$ = cold('---a-', { a: void 0 });
             const expected = 'sa-sb-';
-            const source$ = rxStateful$(s$, { ...defaultConfig, refetchStrategies: [withRefetchOnTrigger(refresh$)] });
+            const source$ = rxStateful$(s$, {
+              ...defaultConfig,
+              refetchStrategies: withRefetchOnTrigger(refresh$)
+            });
 
-            expectObservable(source$).toBe(
+            expectObservable(source$.value$()).toBe(
               expected,
               marbelize({
                 s: {
@@ -86,10 +89,10 @@ describe(rxStateful$.name, () => {
             const source$ = rxStateful$(s$, {
               ...defaultConfig,
               keepValueOnRefresh: true,
-              refetchStrategies: [withRefetchOnTrigger(refresh$)],
+              refetchStrategies: withRefetchOnTrigger(refresh$)
             });
 
-            expectObservable(source$).toBe(
+            expectObservable(source$.value$()).toBe(
               expected,
               marbelize({
                 z: {
@@ -145,7 +148,7 @@ describe(rxStateful$.name, () => {
 
           const expected = 'a--b';
 
-          expectObservable(source$).toBe(
+          expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
               a: {
@@ -194,7 +197,7 @@ describe(rxStateful$.name, () => {
             },
           });
 
-          expectObservable(source$).toBe(
+          expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
               s: {
@@ -248,7 +251,7 @@ describe(rxStateful$.name, () => {
             },
           });
 
-          expectObservable(source$).toBe(
+          expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
               z: {
@@ -303,7 +306,7 @@ describe(rxStateful$.name, () => {
                 refetchStrategies: [withRefetchOnTrigger(refresh$)],
               });
 
-              expectObservable(source$).toBe(
+              expectObservable(source$.value$()).toBe(
                 expected,
                 marbelize({
                   s: {
@@ -338,7 +341,7 @@ describe(rxStateful$.name, () => {
                 refetchStrategies: [withRefetchOnTrigger(refresh$)],
               });
 
-              expectObservable(source$).toBe(
+              expectObservable(source$.value$()).toBe(
                 expected,
                 marbelize({
                   z: {
@@ -373,7 +376,7 @@ describe(rxStateful$.name, () => {
             const source$ = new Subject<any>();
             const beforeHandleErrorFn = jest.fn();
             const result = subscribeSpyTo(
-              rxStateful$<any>(source$.pipe(mergeAll()), { ...defaultConfig, beforeHandleErrorFn })
+              rxStateful$<any>(source$.pipe(mergeAll()), { ...defaultConfig, beforeHandleErrorFn }).value$()
             );
 
             source$.next(throwError(() => new Error('error')));
@@ -393,7 +396,7 @@ describe(rxStateful$.name, () => {
                 refetchStrategies: [withRefetchOnTrigger(refresh$)],
               });
 
-              expectObservable(source$).toBe(
+              expectObservable(source$.value$()).toBe(
                 expected,
                 marbelize({
                   s: {
@@ -432,7 +435,7 @@ describe(rxStateful$.name, () => {
                   trigger: trigger$
               }});
 
-              expectObservable(source$).toBe(
+              expectObservable(source$.value$()).toBe(
                 expected,
                 marbelize({
                   s: {
@@ -468,7 +471,7 @@ describe(rxStateful$.name, () => {
                   trigger: trigger$
                 }});
 
-              expectObservable(source$).toBe(
+              expectObservable(source$.value$()).toBe(
                 expected,
                 marbelize({
                   z: {
@@ -505,7 +508,7 @@ describe(rxStateful$.name, () => {
             const result = subscribeSpyTo(
               rxStateful$<any, any>(() => throwError(() => new Error('error')), { ...defaultConfig, beforeHandleErrorFn, sourceTriggerConfig: {
                 trigger: trigger$
-                } })
+                } }).value$()
             );
 
             trigger$.next(null)
@@ -528,7 +531,7 @@ describe(rxStateful$.name, () => {
                   trigger: trigger$
                 }});
 
-              expectObservable(source$).toBe(
+              expectObservable(source$.value$()).toBe(
                 expected,
                 marbelize({
                   s: {
@@ -575,7 +578,7 @@ describe(rxStateful$.name, () => {
           const expected = '-a---';
           const source$ = rxStateful$(s$, { ...defaultConfig, refetchStrategies: [withRefetchOnTrigger(refresh$)] });
 
-          expectObservable(source$).toBe(
+          expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
               a: {
@@ -600,7 +603,7 @@ describe(rxStateful$.name, () => {
           const expected = '--s-a';
           const source$ = rxStateful$(s$, { ...defaultConfig });
 
-          expectObservable(source$).toBe(
+          expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
               a: {
@@ -633,7 +636,7 @@ describe(rxStateful$.name, () => {
           const expected = '--s---a';
           const source$ = rxStateful$(s$, { ...defaultConfig });
 
-          expectObservable(source$).toBe(
+          expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
               a: {
@@ -670,7 +673,7 @@ describe(rxStateful$.name, () => {
           const expected = '-a--b';
           const source$ = rxStateful$((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
 
-          expectObservable(source$).toBe(
+          expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
               a: {
@@ -705,7 +708,7 @@ describe(rxStateful$.name, () => {
           const expected = '--s-a--s-b';
           const source$ = rxStateful$((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
 
-          expectObservable(source$).toBe(
+          expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
               a: {
@@ -748,7 +751,7 @@ describe(rxStateful$.name, () => {
           const expected = '--s---a----s---b-----';
           const source$ = rxStateful$((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
 
-          expectObservable(source$).toBe(
+          expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
               a: {

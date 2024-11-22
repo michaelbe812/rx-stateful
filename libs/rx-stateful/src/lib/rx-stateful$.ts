@@ -28,6 +28,7 @@ import {
   InternalRxState,
   RxStateful,
   RxStatefulConfig,
+  RxStatefulRequest,
   RxStatefulSourceTriggerConfig,
   RxStatefulWithError,
 } from './types/types';
@@ -37,6 +38,8 @@ import {createRxStateful} from './util/create-rx-stateful';
 import {mergeRefetchStrategies} from "./refetch-strategies/merge-refetch-strategies";
 import {isFunctionGuard, isSourceTriggerConfigGuard} from "./types/guards";
 import {applyFlatteningOperator} from "./util/apply-flattening-operator";
+import { withRefetchOnTrigger } from './refetch-strategies/refetch-on-trigger.strategy';
+
 
 
 /**
@@ -54,7 +57,7 @@ import {applyFlatteningOperator} from "./util/apply-flattening-operator";
  *
  * @param source$ - The source$ to enhance with additional state information.
  */
-export function rxStateful$<T, E = unknown>(source$: Observable<T>): Observable< RxStateful<T, E>>;
+export function rxStateful$<T, E = unknown>(source$: Observable<T>): RxStatefulRequest<T, E>;
 /**
  * @publicApi
  *
@@ -65,7 +68,7 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>): Observable<
  * @param source$ - The source$ to enhance with additional state information.
  * @param config - Configuration for rxStateful$.
  */
-export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T, E>): Observable<RxStateful<T, E>>;
+export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T, E>): RxStatefulRequest<T, E>;
 /**
  * @publicApi
  *
@@ -75,27 +78,38 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxSt
  * @param sourceFn$
  * @param sourceTriggerConfig
  */
-export function rxStateful$<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<T>, sourceTriggerConfig: RxStatefulSourceTriggerConfig<T,A, E>): Observable< RxStateful<T, E>>;
+export function rxStateful$<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<T>, sourceTriggerConfig: RxStatefulSourceTriggerConfig<T,A, E>): RxStatefulRequest<T, E>;
 
 
 export function rxStateful$<T,A, E = unknown>(
     sourceOrSourceFn$: Observable<T> | ((arg: A) => Observable<T>),
     config?: RxStatefulConfig<T, E> | RxStatefulSourceTriggerConfig<T,A,E>,
-): Observable<RxStateful<T, E>> {
+): RxStatefulRequest<T, E> {
+    // Create internal refresh subject
+    const refreshSubject = new Subject<void>();
+
     /**
      * Merge default config with user provided config
      */
     const mergedConfig: RxStatefulConfig<T, E> = {
         keepValueOnRefresh: false,
         keepErrorOnRefresh: false,
-        // to not break existing behavior we set the default to 0 for suspenseThresholdMs and suspenseTimeMs
         suspenseThresholdMs: 0,
         suspenseTimeMs: 0,
-        ...config
+        ...config,
+        refetchStrategies: [
+          withRefetchOnTrigger(refreshSubject),
+          ...(Array.isArray(config?.refetchStrategies) ? config.refetchStrategies : config?.refetchStrategies ? [config.refetchStrategies] : [])
+        ]
     };
 
-    return createRxStateful<T, E>(createState$<T,A, E>(sourceOrSourceFn$, mergedConfig), mergedConfig)
+    const state$ = createState$<T,A, E>(sourceOrSourceFn$, mergedConfig);
+    const rxStateful = createRxStateful<T, E>(state$, mergedConfig);
 
+    return {
+        value$: () => rxStateful,
+        refresh: () => refreshSubject.next()
+    };
 }
 
 /**
@@ -110,9 +124,6 @@ function createState$<T,A, E>(
 
     const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
     const error$$ = new Subject<RxStatefulWithError<T, E>>();
-
-    const refreshTriggerIsBehaivorSubject = (config: RxStatefulConfig<T, E>) =>
-        config.refreshTrigger$ instanceof BehaviorSubject;
 
   const suspenseThreshold: number = mergedConfig.suspenseThresholdMs!;
   const suspenseTime: number = mergedConfig.suspenseTimeMs!;
@@ -148,7 +159,6 @@ function createState$<T,A, E>(
         )
 
         const refreshTrigger$ = merge(
-            mergedConfig?.refreshTrigger$ ?? new Subject<unknown>(),
             ...mergeRefetchStrategies(mergedConfig?.refetchStrategies)
         );
 
@@ -156,13 +166,6 @@ function createState$<T,A, E>(
          * value when we refresh
          */
         const refreshedValue$ = refreshTrigger$.pipe(
-            /**
-             * in case the refreshTrigger$ is a BehaviorSubject, we want to skip the first value
-             * bc otherwise the emissions are not correct. It will then emit 4 vales instead of 2.
-             * the 2 additional values come from isRefreshing which is not correct.
-             */
-            // @ts-ignore todo
-            refreshTriggerIsBehaivorSubject(mergedConfig) ? skip(1) : pipe(),
             /**
              * TODO
              * verify if we can safely ignore that cachedArgument is undefined.
@@ -311,18 +314,10 @@ function createState$<T,A, E>(
 
         const refresh$ = merge(
             new BehaviorSubject(null),
-            mergedConfig?.refreshTrigger$ ?? new Subject<unknown>(),
             ...mergeRefetchStrategies(mergedConfig?.refetchStrategies)
         )
 
       const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refresh$.pipe(
-            /**
-             * in case the refreshTrigger$ is a BehaviorSubject, we want to skip the first value
-             * bc otherwise the emissions are not correct. It will then emit 4 vales instead of 2.
-             * the 2 additional values come from isRefreshing which is not correct.
-             */
-            // @ts-ignore todo
-            refreshTriggerIsBehaivorSubject(mergedConfig) ? skip(1) : pipe(),
             // @ts-ignore
             switchMap(() =>
                 sharedSource$.pipe(
