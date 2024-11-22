@@ -56,6 +56,8 @@ import { withRefetchOnTrigger } from './refetch-strategies/refetch-on-trigger.st
  * const rxStateful$ = rxStateful$(source$);
  *
  * @param source$ - The source$ to enhance with additional state information.
+ *
+ * @deprecated use rxStatefulRequest instead
  */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>): Observable< RxStateful<T, E>>;
 /**
@@ -67,6 +69,8 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>): Observable<
  *
  * @param source$ - The source$ to enhance with additional state information.
  * @param config - Configuration for rxStateful$.
+ *
+ * @deprecated use rxStatefulRequest instead
  */
 export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T, E>): Observable< RxStateful<T, E>>;
 /**
@@ -77,6 +81,8 @@ export function rxStateful$<T, E = unknown>(source$: Observable<T>, config: RxSt
  * const rxStateful$ = rxStateful$((arg: string) => httpClient.get(`https://my-api.com/${arg}`), { keepValueOnRefresh: true, sourceTriggerConfig: {trigger: sourceTrigger$$}})
  * @param sourceFn$
  * @param sourceTriggerConfig
+ *
+ * @deprecated use rxStatefulRequest instead
  */
 export function rxStateful$<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<T>, sourceTriggerConfig: RxStatefulSourceTriggerConfig<T,A, E>): Observable< RxStateful<T, E>>;
 
