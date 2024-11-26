@@ -1,0 +1,8 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "migrate-to-rx-stateful-request",
+  "title": "Migrate from rxStateful$ to rxStatefulRequest",
+  "type": "object",
+  "properties": {},
+  "required": []
+} 

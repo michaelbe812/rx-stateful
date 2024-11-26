@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "migrate-to-rx-stateful-request": {
+      "description": "Migrates from rxStateful$ to rxStatefulRequest",
+      "factory": "./migrations/migrate-to-rx-stateful-request",
+      "schema": "./migrations/migrate-to-rx-stateful-request/schema.json"
+    }
+  }
+}
