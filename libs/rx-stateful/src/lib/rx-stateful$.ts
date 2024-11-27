@@ -1,3 +1,4 @@
+import { inject, Injector, runInInjectionContext, assertInInjectionContext } from '@angular/core';
 import {
   BehaviorSubject,
   catchError,
@@ -10,12 +11,10 @@ import {
   NEVER,
   Observable,
   of,
-  pipe,
   race,
   ReplaySubject,
   scan,
   share,
-  skip,
   startWith,
   Subject,
   switchMap,
@@ -28,7 +27,6 @@ import {
   InternalRxState,
   RxStateful,
   RxStatefulConfig,
-  RxStatefulRequest,
   RxStatefulSourceTriggerConfig,
   RxStatefulWithError,
 } from './types/types';
@@ -38,7 +36,7 @@ import {createRxStateful} from './util/create-rx-stateful';
 import {mergeRefetchStrategies} from "./refetch-strategies/merge-refetch-strategies";
 import {isFunctionGuard, isSourceTriggerConfigGuard} from "./types/guards";
 import {applyFlatteningOperator} from "./util/apply-flattening-operator";
-import { withRefetchOnTrigger } from './refetch-strategies/refetch-on-trigger.strategy';
+import { RX_STATEFUL_CONFIG } from './config/rx-stateful-config';
 
 
 
@@ -91,24 +89,30 @@ export function rxStateful$<T,A, E = unknown>(
     sourceOrSourceFn$: Observable<T> | ((arg: A) => Observable<T>),
     config?: RxStatefulConfig<T, E> | RxStatefulSourceTriggerConfig<T,A,E>,
 ): Observable< RxStateful<T, E>> {
-    // Create internal refresh subject
+   !config?.injector && assertInInjectionContext(rxStateful$);
+	  const assertedInjector = config?.injector ?? inject(Injector);
+
+    return runInInjectionContext(assertedInjector, () => {
+      const globalConfig = inject(RX_STATEFUL_CONFIG, {optional: true});
+        /**
+         * Merge default config with user provided config
+         */
+        const mergedConfig: RxStatefulConfig<T, E> = {
+          keepValueOnRefresh: false,
+          keepErrorOnRefresh: false,
+          suspenseThresholdMs: 0,
+          suspenseTimeMs: 0,
+          ...globalConfig,
+          ...config
+      };
+
+      const state$ = createState$<T,A, E>(sourceOrSourceFn$, mergedConfig);
+      const rxStateful = createRxStateful<T, E>(state$, mergedConfig);
+
+      return rxStateful
+    })
 
 
-    /**
-     * Merge default config with user provided config
-     */
-    const mergedConfig: RxStatefulConfig<T, E> = {
-        keepValueOnRefresh: false,
-        keepErrorOnRefresh: false,
-        suspenseThresholdMs: 0,
-        suspenseTimeMs: 0,
-        ...config
-    };
-
-    const state$ = createState$<T,A, E>(sourceOrSourceFn$, mergedConfig);
-    const rxStateful = createRxStateful<T, E>(state$, mergedConfig);
-
-    return rxStateful
 }
 
 /**

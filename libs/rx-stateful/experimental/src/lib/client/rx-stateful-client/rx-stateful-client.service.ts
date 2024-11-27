@@ -1,7 +1,12 @@
-import {Injectable} from '@angular/core';
-import {Config, injectRxStatefulConfig} from '../config/rx-stateful-config.provider';
+import {inject, Injectable} from '@angular/core';
 import {map, Observable} from 'rxjs';
-import {RxStateful, RxStatefulConfig, rxStateful$} from '@angular-kit/rx-stateful';
+import {
+  RxStateful,
+  RxStatefulConfig,
+  rxStateful$,
+  Config,
+  RX_STATEFUL_CONFIG
+} from '@angular-kit/rx-stateful';
 
 
 export type RxStatefulRequestOptions<T, E> = RxStatefulConfig<T, E>;
@@ -10,7 +15,7 @@ export type RxStatefulRequestOptions<T, E> = RxStatefulConfig<T, E>;
   providedIn: 'root',
 })
 export class RxStatefulClient {
-  private readonly config = injectRxStatefulConfig();
+  private readonly config = inject(RX_STATEFUL_CONFIG, {optional: true});
 
   request<T, E>(source$: Observable<T>): Observable<RxStateful<T, E>>
   request<T, E, K extends keyof RxStateful<T,E>>(source$: Observable<T>, key: K): Observable<RxStateful<T, E>[K]>;

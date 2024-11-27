@@ -1,6 +1,7 @@
 import {Observable, Subject} from 'rxjs';
 import {RxStatefulAccumulationFn} from "./accumulation-fn";
 import {RefetchStrategy} from "../refetch-strategies/refetch-strategy";
+import {Injector} from "@angular/core";
 
 
 
@@ -93,6 +94,8 @@ export interface RxStatefulConfig<T, E = unknown> {
    * the next value is emitted.
    */
   suspenseTimeMs?: number;
+
+  injector?: Injector;
 }
 
 export interface SourceTriggerConfig<A> {

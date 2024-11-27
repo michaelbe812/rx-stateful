@@ -1,4 +1,4 @@
-import { rxStatefulRequest } from './rx-stateful';
+import { rxStatefulRequest } from './rx-stateful-request';
 import { TestScheduler, RunHelpers } from 'rxjs/testing';
 import {mergeAll, of, Subject, throwError} from 'rxjs';
 import { RxStateful, RxStatefulConfig } from './types/types';

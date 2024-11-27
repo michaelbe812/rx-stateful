@@ -1,5 +1,5 @@
 export * from './lib/rx-stateful$';
-export {rxStatefulRequest} from './lib/rx-stateful'
+export {rxStatefulRequest} from './lib/rx-stateful-request'
 export {
   RxStatefulContext,
   RxStateful,
@@ -12,3 +12,4 @@ export { RxStatefulAccumulationFn } from './lib/types/accumulation-fn';
 export {RefetchStrategy} from './lib/refetch-strategies/refetch-strategy';
 export {withAutoRefetch} from './lib/refetch-strategies/refetch-on-auto.strategy';
 export {withRefetchOnTrigger} from './lib/refetch-strategies/refetch-on-trigger.strategy';
+export {Config, RX_STATEFUL_CONFIG, provideRxStatefulConfig} from './lib/config/rx-stateful-config';

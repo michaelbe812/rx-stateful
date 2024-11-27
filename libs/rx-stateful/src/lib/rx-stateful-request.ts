@@ -11,6 +11,8 @@ import {_handleSyncValue} from './util/handle-sync-value';
 import {createRxStateful} from './util/create-rx-stateful';
 import { withRefetchOnTrigger } from './refetch-strategies/refetch-on-trigger.strategy';
 import { createState$ } from './rx-stateful$';
+import { assertInInjectionContext, inject, Injector, runInInjectionContext } from '@angular/core';
+import { RX_STATEFUL_CONFIG } from './config/rx-stateful-config';
 
 
 
@@ -55,6 +57,11 @@ export function rxStatefulRequest<T,A, E = unknown>(
     sourceOrSourceFn$: Observable<T> | ((arg: A) => Observable<T>),
     config?: RxStatefulConfig<T, E> | RxStatefulSourceTriggerConfig<T,A,E>,
 ): RxStatefulRequest<T, E> {
+  !config?.injector && assertInInjectionContext(rxStatefulRequest);
+  const assertedInjector = config?.injector ?? inject(Injector);
+
+  return runInInjectionContext(assertedInjector, () => {
+    const globalConfig = inject(RX_STATEFUL_CONFIG, {optional: true});
    // Create internal refresh subject
    const refreshSubject = new Subject<void>();
 
@@ -66,6 +73,7 @@ export function rxStatefulRequest<T,A, E = unknown>(
        keepErrorOnRefresh: false,
        suspenseThresholdMs: 0,
        suspenseTimeMs: 0,
+       ...globalConfig,
        ...config,
        refetchStrategies: [
          withRefetchOnTrigger(refreshSubject),
@@ -80,4 +88,5 @@ export function rxStatefulRequest<T,A, E = unknown>(
        value$: () => rxStateful,
        refresh: () => refreshSubject.next()
    };
+  })
 }
