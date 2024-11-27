@@ -93,7 +93,7 @@ export class NonFlickerComponent {
   state$ = rxStateful$(this.fetch(450), {
     keepValueOnRefresh: false,
     keepErrorOnRefresh: false,
-    refreshTrigger$: this.refresh$$,
+    refetchStrategies: withRefetchOnTrigger(this.refresh$$),
     suspenseTimeMs: 3000,
     suspenseThresholdMs: 500
   });
