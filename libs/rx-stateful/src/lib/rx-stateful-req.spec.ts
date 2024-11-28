@@ -4,6 +4,13 @@ import {mergeAll, of, Subject, throwError} from 'rxjs';
 import { RxStateful, RxStatefulConfig } from './types/types';
 import { withRefetchOnTrigger } from './refetch-strategies/refetch-on-trigger.strategy';
 import {subscribeSpyTo} from "@hirez_io/observer-spy";
+import {TestBed} from "@angular/core/testing";
+
+function test(label: string, callback: () => void) {
+  it(label, () => {
+    TestBed.runInInjectionContext(callback);
+  });
+}
 
 describe(rxStatefulRequest.name, () => {
   describe('non-flicker suspense not used', () => {
@@ -14,10 +21,13 @@ describe(rxStatefulRequest.name, () => {
       keepErrorOnRefresh: false,
     };
     describe('Observable Signature', () => {
-      it('should not emit a suspense = true state for sync observable', () => {
+      test('should not emit a suspense = true state for sync observable', () => {
         runWithTestScheduler(({ expectObservable }) => {
-          const source$ = rxStatefulRequest(of(1), defaultConfig);
-
+          // const source$ = rxStatefulRequest(of(1), defaultConfig);
+          const source$ = rxStatefulRequest({
+            requestFn: () => of(1),
+            config: defaultConfig,
+          })
           const expected = 's';
 
           expectObservable(source$.value$()).toBe(
@@ -36,19 +46,26 @@ describe(rxStatefulRequest.name, () => {
         });
       });
       // TODO
-      // it('underlying source$ should be multicasted', () => {
+      // test('underlying source$ should be multicasted', () => {
       //
       // });
       describe('Using refreshTrigger', () => {
-        it('should emit the correct state when using a refreshTrigger ', () => {
+        test('should emit the correct state when using a refreshTrigger ', () => {
           runWithTestScheduler(({ expectObservable, cold }) => {
             const s$ = cold('-a|', { a: 1 });
             const refresh$ = cold('---a-', { a: void 0 });
             const expected = 'sa-sb-';
-            const source$ = rxStatefulRequest(s$, {
-              ...defaultConfig,
-              refetchStrategies: withRefetchOnTrigger(refresh$)
-            });
+            // const source$ = rxStatefulRequest(s$, {
+            //   ...defaultConfig,
+            //   refetchStrategies: withRefetchOnTrigger(refresh$)
+            // });
+            const source$ = rxStatefulRequest({
+              requestFn: () => s$,
+              config: {
+                ...defaultConfig,
+                refetchStrategies: withRefetchOnTrigger(refresh$)
+              }
+            })
 
             expectObservable(source$.value$()).toBe(
               expected,
@@ -81,16 +98,24 @@ describe(rxStatefulRequest.name, () => {
             );
           });
         });
-        it('should keep the value on refresh when keepValueOnRefresh = true', () => {
+        test('should keep the value on refresh when keepValueOnRefresh = true', () => {
           runWithTestScheduler(({ expectObservable, cold }) => {
             const s$ = cold('-a|', { a: 1 });
             const refresh$ = cold('---a-', { a: void 0 });
             const expected = 'za-yb-';
-            const source$ = rxStatefulRequest(s$, {
-              ...defaultConfig,
-              keepValueOnRefresh: true,
-              refetchStrategies: withRefetchOnTrigger(refresh$)
-            });
+            // const source$ = rxStatefulRequest(s$, {
+            //   ...defaultConfig,
+            //   keepValueOnRefresh: true,
+            //   refetchStrategies: withRefetchOnTrigger(refresh$)
+            // });
+            const source$ = rxStatefulRequest({
+              requestFn: () => s$,
+              config: {
+                ...defaultConfig,
+                keepValueOnRefresh: true,
+                refetchStrategies: withRefetchOnTrigger(refresh$)
+              }
+            })
 
             expectObservable(source$.value$()).toBe(
               expected,
@@ -136,13 +161,20 @@ describe(rxStatefulRequest.name, () => {
     });
 
     describe('Callback Signature', () => {
-      it('should not emit a suspense = true state for sync observables', () => {
+      test('should not emit a suspense = true state for sync observables', () => {
         runWithTestScheduler(({ expectObservable, cold }) => {
           const trigger = cold('a--b', { a: 1, b: 2 });
-          const source$ = rxStatefulRequest((n) => of(n), {
-            ...defaultConfig,
-            sourceTriggerConfig: {
-              trigger,
+          // const source$ = rxStatefulRequest((n) => of(n), {
+          //   ...defaultConfig,
+          //   sourceTriggerConfig: {
+          //     trigger,
+          //   },
+          // });
+          const source$ = rxStatefulRequest({
+            trigger,
+            requestFn: (n) => of(n),
+            config: {
+              ...defaultConfig,
             },
           });
 
@@ -172,10 +204,10 @@ describe(rxStatefulRequest.name, () => {
         });
       });
       // TODO
-      // it('underlying source$ should be multicasted', () => {
+      // test('underlying source$ should be multicasted', () => {
       //
       // });
-      it('should emit correct state when sourceTrigger emits and when a refetch is happening', () => {
+      test('should emit correct state when sourceTrigger emits and when a refetch is happening', () => {
         runWithTestScheduler(({ expectObservable, cold }) => {
           /**
            * trigger    -a-----b-
@@ -189,13 +221,22 @@ describe(rxStatefulRequest.name, () => {
           const s$ = (n: number) => cold('-a', { a: n });
           const expected = '-sasa--sb';
 
-          const source$ = rxStatefulRequest((n) => s$(n), {
-            ...defaultConfig,
-            refetchStrategies: [withRefetchOnTrigger(refresh)],
-            sourceTriggerConfig: {
-              trigger,
-            },
-          });
+          // const source$ = rxStatefulRequest((n) => s$(n), {
+          //   ...defaultConfig,
+          //   refetchStrategies: [withRefetchOnTrigger(refresh)],
+          //   sourceTriggerConfig: {
+          //     trigger,
+          //   },
+          // });
+          const source$ = rxStatefulRequest({
+            trigger,
+            requestFn: (n) => s$(n),
+            config: {
+              ...defaultConfig,
+              refetchStrategies: [withRefetchOnTrigger(refresh)],
+            }
+
+          })
 
           expectObservable(source$.value$()).toBe(
             expected,
@@ -228,7 +269,7 @@ describe(rxStatefulRequest.name, () => {
           );
         });
       });
-      it('should keep the value on refresh when keepValueOnRefresh = true', () => {
+      test('should keep the value on refresh when keepValueOnRefresh = true', () => {
         runWithTestScheduler(({ expectObservable, cold }) => {
           /**
            * trigger    -a-----b-
@@ -242,14 +283,19 @@ describe(rxStatefulRequest.name, () => {
           const s$ = (n: number) => cold('-a', { a: n });
           const expected = '-zaxa--xb';
 
-          const source$ = rxStatefulRequest((n) => s$(n), {
-            ...defaultConfig,
-            keepValueOnRefresh: true,
-            refetchStrategies: [withRefetchOnTrigger(refresh)],
-            sourceTriggerConfig: {
-              trigger,
-            },
-          });
+          // const source$ = rxStatefulRequest((n) => s$(n), {
+          //   ...defaultConfig,
+          //   keepValueOnRefresh: true,
+          //   refetchStrategies: [withRefetchOnTrigger(refresh)],
+          //   sourceTriggerConfig: {
+          //     trigger,
+          //   },
+          // });
+          const source$ = rxStatefulRequest({
+            trigger,
+            requestFn: (n) => s$(n),
+            config: {...defaultConfig, keepValueOnRefresh: true, refetchStrategies: [withRefetchOnTrigger(refresh)]}
+          })
 
           expectObservable(source$.value$()).toBe(
             expected,
@@ -295,16 +341,23 @@ describe(rxStatefulRequest.name, () => {
     describe('Error Handling', () => {
       describe('Observable Signature', () => {
         describe('When error happens', () => {
-          it('should handle error and operate correctly afterwards', () => {
+          test('should handle error and operate correctly afterwards', () => {
             runWithTestScheduler(({ expectObservable, cold }) => {
               const error = new Error('oops');
               const s$ = cold('-#', {}, error);
               const refresh$ = cold('---a-', { a: void 0 });
               const expected = 'sa-sa-';
-              const source$ = rxStatefulRequest(s$, {
-                ...defaultConfig,
-                refetchStrategies: [withRefetchOnTrigger(refresh$)],
-              });
+              // const source$ = rxStatefulRequest(s$, {
+              //   ...defaultConfig,
+              //   refetchStrategies: [withRefetchOnTrigger(refresh$)],
+              // });
+              const source$ = rxStatefulRequest({
+                requestFn: () => s$,
+                config: {
+                  ...defaultConfig,
+                  refetchStrategies: [withRefetchOnTrigger(refresh$)],
+                }
+              })
 
               expectObservable(source$.value$()).toBe(
                 expected,
@@ -329,17 +382,25 @@ describe(rxStatefulRequest.name, () => {
               );
             });
           });
-          it('should keep the error on refresh when keepErrorOnRefresh = true', () => {
+          test('should keep the error on refresh when keepErrorOnRefresh = true', () => {
             runWithTestScheduler(({ expectObservable, cold }) => {
               const error = new Error('oops');
               const s$ = cold('-#', {}, error);
               const refresh$ = cold('---a-', { a: void 0 });
               const expected = 'za-ya-';
-              const source$ = rxStatefulRequest(s$, {
-                ...defaultConfig,
-                keepErrorOnRefresh: true,
-                refetchStrategies: [withRefetchOnTrigger(refresh$)],
-              });
+              // const source$ = rxStatefulRequest(s$, {
+              //   ...defaultConfig,
+              //   keepErrorOnRefresh: true,
+              //   refetchStrategies: [withRefetchOnTrigger(refresh$)],
+              // });
+              const source$ = rxStatefulRequest({
+                requestFn: () => s$,
+                config: {
+                  ...defaultConfig,
+                  keepErrorOnRefresh: true,
+                  refetchStrategies: [withRefetchOnTrigger(refresh$)],
+                }
+              })
 
               expectObservable(source$.value$()).toBe(
                 expected,
@@ -372,29 +433,46 @@ describe(rxStatefulRequest.name, () => {
               );
             });
           });
-          it('should execute beforeHandleErrorFn', () => {
+          test('should execute beforeHandleErrorFn', () => {
             const source$ = new Subject<any>();
             const beforeHandleErrorFn = jest.fn();
+            // const result = subscribeSpyTo(
+            //   rxStatefulRequest<any>(source$.pipe(mergeAll()), { ...defaultConfig, beforeHandleErrorFn }).value$()
+            // );
             const result = subscribeSpyTo(
-              rxStatefulRequest<any>(source$.pipe(mergeAll()), { ...defaultConfig, beforeHandleErrorFn }).value$()
-            );
+              rxStatefulRequest({
+                requestFn: () => source$.pipe(mergeAll()),
+                config: {
+                  ...defaultConfig,
+                  beforeHandleErrorFn
+                }
+              }).value$()
+            )
 
             source$.next(throwError(() => new Error('error')));
 
             expect(beforeHandleErrorFn).toHaveBeenCalledWith(Error('error'));
             expect(beforeHandleErrorFn).toBeCalledTimes(1);
           });
-          it('should use errorMappingFn', () => {
+          test('should use errorMappingFn', () => {
             runWithTestScheduler(({ expectObservable, cold }) => {
               const error = new Error('oops');
               const s$ = cold('-#', {}, error);
               const refresh$ = cold('---a-', { a: void 0 });
               const expected = 'sa-sa-';
-              const source$ = rxStatefulRequest<any,any>(s$, {
-                ...defaultConfig,
-                errorMappingFn: (error: Error) => error.message,
-                refetchStrategies: [withRefetchOnTrigger(refresh$)],
-              });
+              // const source$ = rxStatefulRequest<any,any>(s$, {
+              //   ...defaultConfig,
+              //   errorMappingFn: (error: Error) => error.message,
+              //   refetchStrategies: [withRefetchOnTrigger(refresh$)],
+              // });
+              const source$ = rxStatefulRequest<any, any, any>({
+                requestFn: () => s$,
+                config: {
+                  ...defaultConfig,
+                  errorMappingFn: (error: Error) => error.message,
+                  refetchStrategies: [withRefetchOnTrigger(refresh$)],
+                }
+              })
 
               expectObservable(source$.value$()).toBe(
                 expected,
@@ -423,17 +501,24 @@ describe(rxStatefulRequest.name, () => {
       });
       describe('Callback Signature', () => {
         describe('When error happens', () => {
-          it('should handle error and operate correctly afterwards', () => {
+          test('should handle error and operate correctly afterwards', () => {
             runWithTestScheduler(({ expectObservable, cold }) => {
               const error = new Error('oops');
               const s$ = cold('-#', {}, error);
               const trigger$ = cold('a---a-', { a: 1 });
               const expected = 'sa--sa-';
-              const source$ = rxStatefulRequest<any, any>((n: number) => s$, {
-                ...defaultConfig,
-              sourceTriggerConfig: {
-                  trigger: trigger$
-              }});
+              // const source$ = rxStatefulRequest<any, any>((n: number) => s$, {
+              //   ...defaultConfig,
+              // sourceTriggerConfig: {
+              //     trigger: trigger$
+              // }});
+              const source$ = rxStatefulRequest({
+                trigger: trigger$,
+                requestFn: (n: number) => s$,
+                config: {
+                  ...defaultConfig
+                }
+              })
 
               expectObservable(source$.value$()).toBe(
                 expected,
@@ -458,18 +543,26 @@ describe(rxStatefulRequest.name, () => {
               );
             });
           });
-          it('should keep the error on refresh when keepErrorOnRefresh = true', () => {
+          test('should keep the error on refresh when keepErrorOnRefresh = true', () => {
             runWithTestScheduler(({ expectObservable, cold }) => {
               const error = new Error('oops');
               const s$ = cold('-#', {}, error);
               const trigger$ = cold('a---a-', { a: 1 });
               const expected = 'za--ya-';
-              const source$ = rxStatefulRequest<any, any>((n: number) => s$, {
-                ...defaultConfig,
-                keepErrorOnRefresh: true,
-                sourceTriggerConfig: {
-                  trigger: trigger$
-                }});
+              // const source$ = rxStatefulRequest<any, any>((n: number) => s$, {
+              //   ...defaultConfig,
+              //   keepErrorOnRefresh: true,
+              //   sourceTriggerConfig: {
+              //     trigger: trigger$
+              //   }});
+              const source$ = rxStatefulRequest({
+                trigger: trigger$,
+                requestFn: (n: number) => s$,
+                config: {
+                  ...defaultConfig,
+                  keepErrorOnRefresh: true,
+                }
+              })
 
               expectObservable(source$.value$()).toBe(
                 expected,
@@ -502,14 +595,23 @@ describe(rxStatefulRequest.name, () => {
               );
             });
           });
-          it('should execute beforeHandleErrorFn', () => {
+          test('should execute beforeHandleErrorFn', () => {
             const trigger$ = new Subject<any>()
             const beforeHandleErrorFn = jest.fn();
-            const result = subscribeSpyTo(
-              rxStatefulRequest<any, any>(() => throwError(() => new Error('error')), { ...defaultConfig, beforeHandleErrorFn, sourceTriggerConfig: {
-                trigger: trigger$
-                } }).value$()
-            );
+            // const result = subscribeSpyTo(
+            //   rxStatefulRequest<any, any>(() => throwError(() => new Error('error')), { ...defaultConfig, beforeHandleErrorFn, sourceTriggerConfig: {
+            //     trigger: trigger$
+            //     } }).value$()
+            // );
+
+            const source$ = subscribeSpyTo(rxStatefulRequest({
+              trigger: trigger$,
+              requestFn: () => throwError(() => new Error('error')),
+              config: {
+                ...defaultConfig,
+                beforeHandleErrorFn
+              }
+            }).value$())
 
             trigger$.next(null)
 
@@ -517,19 +619,28 @@ describe(rxStatefulRequest.name, () => {
             // TODO this needs investigation
             expect(beforeHandleErrorFn).toBeCalledTimes(2);
           });
-          it('should use errorMappingFn', () => {
+          test('should use errorMappingFn', () => {
             runWithTestScheduler(({ expectObservable, cold }) => {
               const error = new Error('oops');
               const s$ = cold('-#', {}, error);
               const trigger$ = cold('a---a-', { a: 1 });
               const expected = 'sa--sa-';
               // @ts-ignore
-              const source$ = rxStatefulRequest<any, any>((n: number) => s$, {
-                ...defaultConfig,
-                errorMappingFn: (error: Error) => error.message,
-                sourceTriggerConfig: {
-                  trigger: trigger$
-                }});
+              // const source$ = rxStatefulRequest<any, any>((n: number) => s$, {
+              //   ...defaultConfig,
+              //   errorMappingFn: (error: Error) => error.message,
+              //   sourceTriggerConfig: {
+              //     trigger: trigger$
+              //   }});
+              const source$ = rxStatefulRequest({
+                trigger: trigger$,
+                requestFn: (n: number) => s$,
+                config: {
+                  ...defaultConfig,
+                  // @ts-ignore
+                  errorMappingFn: (error: Error) => error.message,
+                }
+              })
 
               expectObservable(source$.value$()).toBe(
                 expected,
@@ -566,7 +677,7 @@ describe(rxStatefulRequest.name, () => {
       keepErrorOnRefresh: false,
     };
     describe('Observable Signature', () => {
-      it('should not emit suspense state when source emits before suspenseThreshold is exceeded', () => {
+      test('should not emit suspense state when source emits before suspenseThreshold is exceeded', () => {
         /**
          * s$         -a
          * refresh    ----a
@@ -576,8 +687,14 @@ describe(rxStatefulRequest.name, () => {
           const s$ = cold('-a|', { a: 1 });
           const refresh$ = cold('----a-', { a: void 0 });
           const expected = '-a---';
-          const source$ = rxStatefulRequest(s$, { ...defaultConfig, refetchStrategies: [withRefetchOnTrigger(refresh$)] });
-
+          // const source$ = rxStatefulRequest(s$, { ...defaultConfig, refetchStrategies: [withRefetchOnTrigger(refresh$)] });
+          const source$ = rxStatefulRequest({
+            requestFn: () => s$,
+            config: {
+              ...defaultConfig,
+              refetchStrategies: [withRefetchOnTrigger(refresh$)]
+            }
+          })
           expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
@@ -593,7 +710,7 @@ describe(rxStatefulRequest.name, () => {
           );
         });
       });
-      it('should should emit suspense state when source emits after suspenseThreshold is exceeded', () => {
+      test('should should emit suspense state when source emits after suspenseThreshold is exceeded', () => {
         /**
          * s$         ---a
          * expected   ---s--a
@@ -601,7 +718,13 @@ describe(rxStatefulRequest.name, () => {
         runWithTestScheduler(({ expectObservable, cold }) => {
           const s$ = cold('---a|', { a: 1 });
           const expected = '--s-a';
-          const source$ = rxStatefulRequest(s$, { ...defaultConfig });
+          // const source$ = rxStatefulRequest(s$, { ...defaultConfig });
+          const source$ = rxStatefulRequest({
+            requestFn: () => s$,
+            config: {
+              ...defaultConfig
+            }
+          })
 
           expectObservable(source$.value$()).toBe(
             expected,
@@ -626,7 +749,7 @@ describe(rxStatefulRequest.name, () => {
           );
         });
       });
-      it('should keep suspense state as long as source takes when it takes longer than supsenseThreshold + suspenseTime', () => {
+      test('should keep suspense state as long as source takes when it takes longer than supsenseThreshold + suspenseTime', () => {
         /**
          * s$         ------a
          * expected   --s---a
@@ -634,8 +757,13 @@ describe(rxStatefulRequest.name, () => {
         runWithTestScheduler(({ expectObservable, cold }) => {
           const s$ = cold('------a|', { a: 1 });
           const expected = '--s---a';
-          const source$ = rxStatefulRequest(s$, { ...defaultConfig });
-
+          // const source$ = rxStatefulRequest(s$, { ...defaultConfig });
+          const source$ = rxStatefulRequest({
+            requestFn: () => s$,
+            config: {
+              ...defaultConfig
+            }
+          })
           expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
@@ -661,7 +789,7 @@ describe(rxStatefulRequest.name, () => {
       });
     });
     describe('Callback Signature', () => {
-      it('should not emit suspense state when source emits before suspenseThreshold is exceeded', () => {
+      test('should not emit suspense state when source emits before suspenseThreshold is exceeded', () => {
         /**
          * s$         -a
          * trigger$   a--b-
@@ -671,7 +799,15 @@ describe(rxStatefulRequest.name, () => {
           const s$ = (n: number) => cold('-a|', { a: n });
           const trigger$ = cold('a--b-', { a: 1, b: 2 });
           const expected = '-a--b';
-          const source$ = rxStatefulRequest((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
+          // const source$ = rxStatefulRequest((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
+          const source$ = rxStatefulRequest({
+            trigger: trigger$,
+            requestFn: (n) => s$(n),
+            config: {
+              ...defaultConfig,
+
+            }
+          })
 
           expectObservable(source$.value$()).toBe(
             expected,
@@ -696,7 +832,7 @@ describe(rxStatefulRequest.name, () => {
           );
         });
       });
-      it('should should emit suspense state when source emits after suspenseThreshold is exceeded', () => {
+      test('should should emit suspense state when source emits after suspenseThreshold is exceeded', () => {
         /**
          * s$         --a
          * trigger$   a----b------
@@ -706,8 +842,14 @@ describe(rxStatefulRequest.name, () => {
           const s$ = (n: number) => cold('---a|', { a: n });
           const trigger$ = cold('a----b------', { a: 1, b: 2 });
           const expected = '--s-a--s-b';
-          const source$ = rxStatefulRequest((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
-
+          // const source$ = rxStatefulRequest((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
+          const source$ = rxStatefulRequest({
+            trigger: trigger$,
+            requestFn: (n) => s$(n),
+            config: {
+              ...defaultConfig
+            }
+          })
           expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
@@ -739,7 +881,7 @@ describe(rxStatefulRequest.name, () => {
           );
         });
       });
-      it('should keep suspense state as long as source takes when it takes longer than supsenseThreshold + suspenseTime', () => {
+      test('should keep suspense state as long as source takes when it takes longer than supsenseThreshold + suspenseTime', () => {
         /**
          * s$         ------a
          * trigger$   a--------b-------
@@ -749,8 +891,14 @@ describe(rxStatefulRequest.name, () => {
           const s$ = (n: number) => cold('------a|', { a: n });
           const trigger$ = cold('a--------b-------', { a: 1, b: 2 });
           const expected = '--s---a----s---b-----';
-          const source$ = rxStatefulRequest((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
-
+          // const source$ = rxStatefulRequest((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
+          const source$ = rxStatefulRequest({
+            trigger: trigger$,
+            requestFn: (n) => s$(n),
+            config: {
+              ...defaultConfig
+            }
+          })
           expectObservable(source$.value$()).toBe(
             expected,
             marbelize({

@@ -14,35 +14,21 @@ import { createState$ } from './rx-stateful$';
 import { assertInInjectionContext, inject, Injector, runInInjectionContext } from '@angular/core';
 import { RX_STATEFUL_CONFIG } from './config/rx-stateful-config';
 
+export type RxStatefulLoader<T,A,E> = {
+  trigger?: Observable<A> | Subject<A>;
+  requestFn: (arg: A) => Observable<T>;
+  config?: RxStatefulConfig<T, E> & {
+    /**
+     *
+     * default: 'switch'
+     */
+    operator?: 'switch' | 'merge' | 'concat' | 'exhaust';
+  };
+}
 
 
-/**
- * @publicApi
- *
- * @description
- * Creates a new rxStateful$ instance.
- *
- * rxStateful$ will enhance the source$ with additional information about the current state of the source$, like
- * e.g. if it is in a suspense or error state.
- *
- * @example
- * const source$ = httpClient.get('https://my-api.com');
- * const rxStateful$ = rxStateful$(source$);
- *
- * @param source$ - The source$ to enhance with additional state information.
- */
-export function rxStatefulRequest<T, E = unknown>(source$: Observable<T>): RxStatefulRequest<T, E>;
-/**
- * @publicApi
- *
- * @example
- * const source$ = httpClient.get('https://my-api.com');
- * const rxStateful$ = rxStateful$(source$, { keepValueOnRefresh: true });
- *
- * @param source$ - The source$ to enhance with additional state information.
- * @param config - Configuration for rxStateful$.
- */
-export function rxStatefulRequest<T, E = unknown>(source$: Observable<T>, config: RxStatefulConfig<T, E>): RxStatefulRequest<T, E>;
+
+
 /**
  * @publicApi
  *
@@ -52,11 +38,9 @@ export function rxStatefulRequest<T, E = unknown>(source$: Observable<T>, config
  * @param sourceFn$
  * @param sourceTriggerConfig
  */
-export function rxStatefulRequest<T,A, E = unknown>(sourceFn$: (arg: A) => Observable<T>, sourceTriggerConfig: RxStatefulSourceTriggerConfig<T,A, E>): RxStatefulRequest<T, E>;
-export function rxStatefulRequest<T,A, E = unknown>(
-    sourceOrSourceFn$: Observable<T> | ((arg: A) => Observable<T>),
-    config?: RxStatefulConfig<T, E> | RxStatefulSourceTriggerConfig<T,A,E>,
-): RxStatefulRequest<T, E> {
+export function rxStatefulRequest<T,A, E = unknown>(loaderOptions: RxStatefulLoader<T, A, E>): RxStatefulRequest<T, E>{
+  const {requestFn, trigger, config} = loaderOptions;
+
   !config?.injector && assertInInjectionContext(rxStatefulRequest);
   const assertedInjector = config?.injector ?? inject(Injector);
 
@@ -80,8 +64,19 @@ export function rxStatefulRequest<T,A, E = unknown>(
          ...(Array.isArray(config?.refetchStrategies) ? config.refetchStrategies : config?.refetchStrategies ? [config.refetchStrategies] : [])
        ]
    };
+    /**
+     * requestFn & !trigger -> source$
+     * requestFn & trigger -> sourceFn$ with trigger
+     */
+    if (trigger){
+      // @ts-ignore
+      mergedConfig.sourceTriggerConfig = {
+        trigger,
+        operator: config?.operator ?? 'switch'
+      }
+    }
 
-   const state$ = createState$<T,A, E>(sourceOrSourceFn$, mergedConfig);
+   const state$ = createState$<T,A, E>(trigger ? requestFn : requestFn(undefined as A), mergedConfig);
    const rxStateful = createRxStateful<T, E>(state$, mergedConfig);
 
    return {
