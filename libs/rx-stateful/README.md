@@ -168,7 +168,10 @@ Please have a look at the [testing documentation](./testing/README.md).
 ## Versioning
 This project follows [Semantic Versioning](https://semver.org/).
 
-- Version `1.x.x` supports Angular >=14.0.0
+
+## Angular Compatibility
+- Version `2.x.x` requires Angular >=18.0.0
+- Version `1.x.x` requires Angular >=14.0.0
 
 ## License
 MIT
