@@ -1,4 +1,4 @@
-import { rxStatefulRequest } from './rx-stateful-request';
+import { rxRequest } from './rx-request';
 import { TestScheduler, RunHelpers } from 'rxjs/testing';
 import {mergeAll, of, Subject, throwError} from 'rxjs';
 import { RxStateful, RxStatefulConfig } from './types/types';
@@ -12,7 +12,7 @@ function test(label: string, callback: () => void) {
   });
 }
 
-describe(rxStatefulRequest.name, () => {
+describe(rxRequest.name, () => {
   describe('non-flicker suspense not used', () => {
     const defaultConfig: RxStatefulConfig<any> = {
       suspenseTimeMs: 0,
@@ -24,7 +24,7 @@ describe(rxStatefulRequest.name, () => {
       test('should not emit a suspense = true state for sync observable', () => {
         runWithTestScheduler(({ expectObservable }) => {
           // const source$ = rxStatefulRequest(of(1), defaultConfig);
-          const source$ = rxStatefulRequest({
+          const source$ = rxRequest({
             requestFn: () => of(1),
             config: defaultConfig,
           })
@@ -59,7 +59,7 @@ describe(rxStatefulRequest.name, () => {
             //   ...defaultConfig,
             //   refetchStrategies: withRefetchOnTrigger(refresh$)
             // });
-            const source$ = rxStatefulRequest({
+            const source$ = rxRequest({
               requestFn: () => s$,
               config: {
                 ...defaultConfig,
@@ -108,7 +108,7 @@ describe(rxStatefulRequest.name, () => {
             //   keepValueOnRefresh: true,
             //   refetchStrategies: withRefetchOnTrigger(refresh$)
             // });
-            const source$ = rxStatefulRequest({
+            const source$ = rxRequest({
               requestFn: () => s$,
               config: {
                 ...defaultConfig,
@@ -170,7 +170,7 @@ describe(rxStatefulRequest.name, () => {
           //     trigger,
           //   },
           // });
-          const source$ = rxStatefulRequest({
+          const source$ = rxRequest({
             trigger,
             requestFn: (n) => of(n),
             config: {
@@ -228,7 +228,7 @@ describe(rxStatefulRequest.name, () => {
           //     trigger,
           //   },
           // });
-          const source$ = rxStatefulRequest({
+          const source$ = rxRequest({
             trigger,
             requestFn: (n) => s$(n),
             config: {
@@ -291,7 +291,7 @@ describe(rxStatefulRequest.name, () => {
           //     trigger,
           //   },
           // });
-          const source$ = rxStatefulRequest({
+          const source$ = rxRequest({
             trigger,
             requestFn: (n) => s$(n),
             config: {...defaultConfig, keepValueOnRefresh: true, refetchStrategies: [withRefetchOnTrigger(refresh)]}
@@ -351,7 +351,7 @@ describe(rxStatefulRequest.name, () => {
               //   ...defaultConfig,
               //   refetchStrategies: [withRefetchOnTrigger(refresh$)],
               // });
-              const source$ = rxStatefulRequest({
+              const source$ = rxRequest({
                 requestFn: () => s$,
                 config: {
                   ...defaultConfig,
@@ -393,7 +393,7 @@ describe(rxStatefulRequest.name, () => {
               //   keepErrorOnRefresh: true,
               //   refetchStrategies: [withRefetchOnTrigger(refresh$)],
               // });
-              const source$ = rxStatefulRequest({
+              const source$ = rxRequest({
                 requestFn: () => s$,
                 config: {
                   ...defaultConfig,
@@ -440,7 +440,7 @@ describe(rxStatefulRequest.name, () => {
             //   rxStatefulRequest<any>(source$.pipe(mergeAll()), { ...defaultConfig, beforeHandleErrorFn }).value$()
             // );
             const result = subscribeSpyTo(
-              rxStatefulRequest({
+              rxRequest({
                 requestFn: () => source$.pipe(mergeAll()),
                 config: {
                   ...defaultConfig,
@@ -465,7 +465,7 @@ describe(rxStatefulRequest.name, () => {
               //   errorMappingFn: (error: Error) => error.message,
               //   refetchStrategies: [withRefetchOnTrigger(refresh$)],
               // });
-              const source$ = rxStatefulRequest<any, any, any>({
+              const source$ = rxRequest<any, any, any>({
                 requestFn: () => s$,
                 config: {
                   ...defaultConfig,
@@ -512,7 +512,7 @@ describe(rxStatefulRequest.name, () => {
               // sourceTriggerConfig: {
               //     trigger: trigger$
               // }});
-              const source$ = rxStatefulRequest({
+              const source$ = rxRequest({
                 trigger: trigger$,
                 requestFn: (n: number) => s$,
                 config: {
@@ -555,7 +555,7 @@ describe(rxStatefulRequest.name, () => {
               //   sourceTriggerConfig: {
               //     trigger: trigger$
               //   }});
-              const source$ = rxStatefulRequest({
+              const source$ = rxRequest({
                 trigger: trigger$,
                 requestFn: (n: number) => s$,
                 config: {
@@ -604,7 +604,7 @@ describe(rxStatefulRequest.name, () => {
             //     } }).value$()
             // );
 
-            const source$ = subscribeSpyTo(rxStatefulRequest({
+            const source$ = subscribeSpyTo(rxRequest({
               trigger: trigger$,
               requestFn: () => throwError(() => new Error('error')),
               config: {
@@ -632,7 +632,7 @@ describe(rxStatefulRequest.name, () => {
               //   sourceTriggerConfig: {
               //     trigger: trigger$
               //   }});
-              const source$ = rxStatefulRequest({
+              const source$ = rxRequest({
                 trigger: trigger$,
                 requestFn: (n: number) => s$,
                 config: {
@@ -688,7 +688,7 @@ describe(rxStatefulRequest.name, () => {
           const refresh$ = cold('----a-', { a: void 0 });
           const expected = '-a---';
           // const source$ = rxStatefulRequest(s$, { ...defaultConfig, refetchStrategies: [withRefetchOnTrigger(refresh$)] });
-          const source$ = rxStatefulRequest({
+          const source$ = rxRequest({
             requestFn: () => s$,
             config: {
               ...defaultConfig,
@@ -719,7 +719,7 @@ describe(rxStatefulRequest.name, () => {
           const s$ = cold('---a|', { a: 1 });
           const expected = '--s-a';
           // const source$ = rxStatefulRequest(s$, { ...defaultConfig });
-          const source$ = rxStatefulRequest({
+          const source$ = rxRequest({
             requestFn: () => s$,
             config: {
               ...defaultConfig
@@ -758,7 +758,7 @@ describe(rxStatefulRequest.name, () => {
           const s$ = cold('------a|', { a: 1 });
           const expected = '--s---a';
           // const source$ = rxStatefulRequest(s$, { ...defaultConfig });
-          const source$ = rxStatefulRequest({
+          const source$ = rxRequest({
             requestFn: () => s$,
             config: {
               ...defaultConfig
@@ -800,7 +800,7 @@ describe(rxStatefulRequest.name, () => {
           const trigger$ = cold('a--b-', { a: 1, b: 2 });
           const expected = '-a--b';
           // const source$ = rxStatefulRequest((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
-          const source$ = rxStatefulRequest({
+          const source$ = rxRequest({
             trigger: trigger$,
             requestFn: (n) => s$(n),
             config: {
@@ -843,7 +843,7 @@ describe(rxStatefulRequest.name, () => {
           const trigger$ = cold('a----b------', { a: 1, b: 2 });
           const expected = '--s-a--s-b';
           // const source$ = rxStatefulRequest((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
-          const source$ = rxStatefulRequest({
+          const source$ = rxRequest({
             trigger: trigger$,
             requestFn: (n) => s$(n),
             config: {
@@ -892,7 +892,7 @@ describe(rxStatefulRequest.name, () => {
           const trigger$ = cold('a--------b-------', { a: 1, b: 2 });
           const expected = '--s---a----s---b-----';
           // const source$ = rxStatefulRequest((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
-          const source$ = rxStatefulRequest({
+          const source$ = rxRequest({
             trigger: trigger$,
             requestFn: (n) => s$(n),
             config: {

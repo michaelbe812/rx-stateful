@@ -1,5 +1,5 @@
 export * from './lib/rx-stateful$';
-export {rxStatefulRequest} from './lib/rx-stateful-request'
+export {rxRequest} from './lib/rx-request'
 export {
   RxStatefulContext,
   RxStateful,

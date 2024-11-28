@@ -38,10 +38,10 @@ export type RxStatefulLoader<T,A,E> = {
  * @param sourceFn$
  * @param sourceTriggerConfig
  */
-export function rxStatefulRequest<T,A, E = unknown>(loaderOptions: RxStatefulLoader<T, A, E>): RxStatefulRequest<T, E>{
+export function rxRequest<T,A, E = unknown>(loaderOptions: RxStatefulLoader<T, A, E>): RxStatefulRequest<T, E>{
   const {requestFn, trigger, config} = loaderOptions;
 
-  !config?.injector && assertInInjectionContext(rxStatefulRequest);
+  !config?.injector && assertInInjectionContext(rxRequest);
   const assertedInjector = config?.injector ?? inject(Injector);
 
   return runInInjectionContext(assertedInjector, () => {
