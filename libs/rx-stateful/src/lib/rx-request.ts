@@ -4,7 +4,7 @@ import {
 } from 'rxjs';
 import {
   RxStatefulConfig,
-  RxStatefulRequest,
+  RxRequest,
   RxStatefulSourceTriggerConfig,
 } from './types/types';
 import {_handleSyncValue} from './util/handle-sync-value';
@@ -38,7 +38,7 @@ export type RxStatefulLoader<T,A,E> = {
  * @param sourceFn$
  * @param sourceTriggerConfig
  */
-export function rxRequest<T,A, E = unknown>(loaderOptions: RxStatefulLoader<T, A, E>): RxStatefulRequest<T, E>{
+export function rxRequest<T,A, E = unknown>(loaderOptions: RxStatefulLoader<T, A, E>): RxRequest<T, E>{
   const {requestFn, trigger, config} = loaderOptions;
 
   !config?.injector && assertInInjectionContext(rxRequest);

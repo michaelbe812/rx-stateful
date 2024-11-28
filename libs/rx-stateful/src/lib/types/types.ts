@@ -120,7 +120,7 @@ export type RxStatefulSourceTriggerConfig<T,A, E = unknown> = RxStatefulConfig<T
  * @description
  * Interface for the stateful request object returned by rxStateful$
  */
-export interface RxStatefulRequest<T, E = unknown> {
+export interface RxRequest<T, E = unknown> {
   /**
    * Observable that emits the current state including value, error, and loading states
    */
