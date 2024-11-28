@@ -4,6 +4,13 @@ import {mergeAll, of, Subject, throwError} from 'rxjs';
 import { RxStateful, RxStatefulConfig } from './types/types';
 import { withRefetchOnTrigger } from './refetch-strategies/refetch-on-trigger.strategy';
 import {subscribeSpyTo} from "@hirez_io/observer-spy";
+import {TestBed} from "@angular/core/testing";
+
+function test(label: string, callback: () => void) {
+  it(label, () => {
+    TestBed.runInInjectionContext(callback);
+  });
+}
 
 describe(rxStateful$.name, () => {
   describe('non-flicker suspense not used', () => {
@@ -14,7 +21,7 @@ describe(rxStateful$.name, () => {
       keepErrorOnRefresh: false,
     };
     describe('Observable Signature', () => {
-      it('should not emit a suspense = true state for sync observable', () => {
+      test('should not emit a suspense = true state for sync observable', () => {
         runWithTestScheduler(({ expectObservable }) => {
           const source$ = rxStateful$(of(1), defaultConfig);
 
@@ -36,11 +43,11 @@ describe(rxStateful$.name, () => {
         });
       });
       // TODO
-      // it('underlying source$ should be multicasted', () => {
+      // test('underlying source$ should be multicasted', () => {
       //
       // });
       describe('Using refreshTrigger', () => {
-        it('should emit the correct state when using a refreshTrigger ', () => {
+        test('should emit the correct state when using a refreshTrigger ', () => {
           runWithTestScheduler(({ expectObservable, cold }) => {
             const s$ = cold('-a|', { a: 1 });
             const refresh$ = cold('---a-', { a: void 0 });
@@ -81,7 +88,7 @@ describe(rxStateful$.name, () => {
             );
           });
         });
-        it('should keep the value on refresh when keepValueOnRefresh = true', () => {
+        test('should keep the value on refresh when keepValueOnRefresh = true', () => {
           runWithTestScheduler(({ expectObservable, cold }) => {
             const s$ = cold('-a|', { a: 1 });
             const refresh$ = cold('---a-', { a: void 0 });
@@ -136,7 +143,7 @@ describe(rxStateful$.name, () => {
     });
 
     describe('Callback Signature', () => {
-      it('should not emit a suspense = true state for sync observables', () => {
+      test('should not emit a suspense = true state for sync observables', () => {
         runWithTestScheduler(({ expectObservable, cold }) => {
           const trigger = cold('a--b', { a: 1, b: 2 });
           const source$ = rxStateful$((n) => of(n), {
@@ -172,10 +179,10 @@ describe(rxStateful$.name, () => {
         });
       });
       // TODO
-      // it('underlying source$ should be multicasted', () => {
+      // test('underlying source$ should be multicasted', () => {
       //
       // });
-      it('should emit correct state when sourceTrigger emits and when a refetch is happening', () => {
+      test('should emit correct state when sourceTrigger emits and when a refetch is happening', () => {
         runWithTestScheduler(({ expectObservable, cold }) => {
           /**
            * trigger    -a-----b-
@@ -228,7 +235,7 @@ describe(rxStateful$.name, () => {
           );
         });
       });
-      it('should keep the value on refresh when keepValueOnRefresh = true', () => {
+      test('should keep the value on refresh when keepValueOnRefresh = true', () => {
         runWithTestScheduler(({ expectObservable, cold }) => {
           /**
            * trigger    -a-----b-
@@ -295,7 +302,7 @@ describe(rxStateful$.name, () => {
     describe('Error Handling', () => {
       describe('Observable Signature', () => {
         describe('When error happens', () => {
-          it('should handle error and operate correctly afterwards', () => {
+          test('should handle error and operate correctly afterwards', () => {
             runWithTestScheduler(({ expectObservable, cold }) => {
               const error = new Error('oops');
               const s$ = cold('-#', {}, error);
@@ -329,7 +336,7 @@ describe(rxStateful$.name, () => {
               );
             });
           });
-          it('should keep the error on refresh when keepErrorOnRefresh = true', () => {
+          test('should keep the error on refresh when keepErrorOnRefresh = true', () => {
             runWithTestScheduler(({ expectObservable, cold }) => {
               const error = new Error('oops');
               const s$ = cold('-#', {}, error);
@@ -372,7 +379,7 @@ describe(rxStateful$.name, () => {
               );
             });
           });
-          it('should execute beforeHandleErrorFn', () => {
+          test('should execute beforeHandleErrorFn', () => {
             const source$ = new Subject<any>();
             const beforeHandleErrorFn = jest.fn();
             const result = subscribeSpyTo(
@@ -384,7 +391,7 @@ describe(rxStateful$.name, () => {
             expect(beforeHandleErrorFn).toHaveBeenCalledWith(Error('error'));
             expect(beforeHandleErrorFn).toBeCalledTimes(1);
           });
-          it('should use errorMappingFn', () => {
+          test('should use errorMappingFn', () => {
             runWithTestScheduler(({ expectObservable, cold }) => {
               const error = new Error('oops');
               const s$ = cold('-#', {}, error);
@@ -423,7 +430,7 @@ describe(rxStateful$.name, () => {
       });
       describe('Callback Signature', () => {
         describe('When error happens', () => {
-          it('should handle error and operate correctly afterwards', () => {
+          test('should handle error and operate correctly afterwards', () => {
             runWithTestScheduler(({ expectObservable, cold }) => {
               const error = new Error('oops');
               const s$ = cold('-#', {}, error);
@@ -458,7 +465,7 @@ describe(rxStateful$.name, () => {
               );
             });
           });
-          it('should keep the error on refresh when keepErrorOnRefresh = true', () => {
+          test('should keep the error on refresh when keepErrorOnRefresh = true', () => {
             runWithTestScheduler(({ expectObservable, cold }) => {
               const error = new Error('oops');
               const s$ = cold('-#', {}, error);
@@ -502,7 +509,7 @@ describe(rxStateful$.name, () => {
               );
             });
           });
-          it('should execute beforeHandleErrorFn', () => {
+          test('should execute beforeHandleErrorFn', () => {
             const trigger$ = new Subject<any>()
             const beforeHandleErrorFn = jest.fn();
             const result = subscribeSpyTo(
@@ -517,7 +524,7 @@ describe(rxStateful$.name, () => {
             // TODO this needs investigation
             expect(beforeHandleErrorFn).toBeCalledTimes(2);
           });
-          it('should use errorMappingFn', () => {
+          test('should use errorMappingFn', () => {
             runWithTestScheduler(({ expectObservable, cold }) => {
               const error = new Error('oops');
               const s$ = cold('-#', {}, error);
@@ -566,7 +573,7 @@ describe(rxStateful$.name, () => {
       keepErrorOnRefresh: false,
     };
     describe('Observable Signature', () => {
-      it('should not emit suspense state when source emits before suspenseThreshold is exceeded', () => {
+      test('should not emit suspense state when source emits before suspenseThreshold is exceeded', () => {
         /**
          * s$         -a
          * refresh    ----a
@@ -593,7 +600,7 @@ describe(rxStateful$.name, () => {
           );
         });
       });
-      it('should should emit suspense state when source emits after suspenseThreshold is exceeded', () => {
+      test('should should emit suspense state when source emits after suspenseThreshold is exceeded', () => {
         /**
          * s$         ---a
          * expected   ---s--a
@@ -626,7 +633,7 @@ describe(rxStateful$.name, () => {
           );
         });
       });
-      it('should keep suspense state as long as source takes when it takes longer than supsenseThreshold + suspenseTime', () => {
+      test('should keep suspense state as long as source takes when it takes longer than supsenseThreshold + suspenseTime', () => {
         /**
          * s$         ------a
          * expected   --s---a
@@ -661,7 +668,7 @@ describe(rxStateful$.name, () => {
       });
     });
     describe('Callback Signature', () => {
-      it('should not emit suspense state when source emits before suspenseThreshold is exceeded', () => {
+      test('should not emit suspense state when source emits before suspenseThreshold is exceeded', () => {
         /**
          * s$         -a
          * trigger$   a--b-
@@ -696,7 +703,7 @@ describe(rxStateful$.name, () => {
           );
         });
       });
-      it('should should emit suspense state when source emits after suspenseThreshold is exceeded', () => {
+      test('should should emit suspense state when source emits after suspenseThreshold is exceeded', () => {
         /**
          * s$         --a
          * trigger$   a----b------
@@ -739,7 +746,7 @@ describe(rxStateful$.name, () => {
           );
         });
       });
-      it('should keep suspense state as long as source takes when it takes longer than supsenseThreshold + suspenseTime', () => {
+      test('should keep suspense state as long as source takes when it takes longer than supsenseThreshold + suspenseTime', () => {
         /**
          * s$         ------a
          * trigger$   a--------b-------

@@ -105,7 +105,6 @@ export function rxStateful$<T,A, E = unknown>(
           ...globalConfig,
           ...config
       };
-
       const state$ = createState$<T,A, E>(sourceOrSourceFn$, mergedConfig);
       const rxStateful = createRxStateful<T, E>(state$, mergedConfig);
 
