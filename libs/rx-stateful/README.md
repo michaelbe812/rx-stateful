@@ -1,6 +1,6 @@
 # @angular-kit/rx-stateful
 
-`rxStateful$` is a powerful RxJs operator that wraps any sync or async Observable and provides a
+`rxStateful$` is a powerful RxJs operator that wraps async Observable and provides a
 stateful stream. It does offer out of the box
 
 - 🔄 loading state
@@ -25,22 +25,7 @@ A live demo is available on [here](https://salmon-river-0283bb503.4.azurestatica
 
 ## Usage
 ### `rxStateful$` as standalone function
-#### Sync source Observable
-```typescript
-import { rxStateful$ } from '@angular-kit/rx-stateful';
 
-/**
- * Sync Observable will return: 
- * [
- * { value: 1, hasValue: true, context: 'next', hasError: false, error: undefined },
- * { value: 2, hasValue: true, context: 'next', hasError: false, error: undefined },
- * { value: 3, hasValue: true, context: 'next', hasError: false, error: undefined },
- * ]
- */
-const stateful$ = rxStateful$(of(1, 2, 3));
-```
-
-#### Async source Observable
 #### Basic Usage
 ```typescript
 import { rxStateful$ } from '@angular-kit/rx-stateful';
