@@ -6,6 +6,6 @@ export function withConfig<T, E>(config: Config<T, E>) {
   return makeFeature('Config', [{ provide: RX_STATEFUL_CONFIG, useValue: config }]);
 }
 
-export function injectRxStatefulConfig<T, E>(): Config<T, E> {
+export function injectRxStatefulConfig<T, E>(): Config<T, E> | null {
   return inject(RX_STATEFUL_CONFIG, { optional: true });
 }

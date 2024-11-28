@@ -11,7 +11,7 @@ export type Config<T, E> = Pick<
 export const RX_STATEFUL_CONFIG = <T,E>() => new InjectionToken<Config<T, E>>('RX_STATEFUL_CONFIG');
 
 export function provideRxStatefulConfig<T, E>(config: Partial<Config<T, E>>) {
-  return makeEnvironmentProviders([{ provide: RX_STATEFUL_CONFIG<T, E>(), useValue: config }]);
+  return makeEnvironmentProviders([{ provide: RX_STATEFUL_CONFIG<T, E>, useValue: config }]);
 }
 
 
