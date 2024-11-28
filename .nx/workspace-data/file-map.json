@@ -1,0 +1,541 @@
+{
+  "version": "6.0",
+  "nxVersion": "19.8.9",
+  "deps": {
+    "@angular/animations": "18.2.9",
+    "@angular/cdk": "18.2.9",
+    "@angular/common": "18.2.9",
+    "@angular/compiler": "18.2.9",
+    "@angular/core": "18.2.9",
+    "@angular/forms": "18.2.9",
+    "@angular/material": "18.2.9",
+    "@angular/platform-browser": "18.2.9",
+    "@angular/platform-browser-dynamic": "18.2.9",
+    "@angular/router": "18.2.9",
+    "@code-workers.io/ngx-dirty-checker": "^1.0.1",
+    "@nx/angular": "19.8.9",
+    "ngx-highlightjs": "^10.0.0",
+    "rxjs": "7.8.1",
+    "tslib": "^2.3.0",
+    "zone.js": "0.14.6",
+    "@angular-devkit/build-angular": "18.2.9",
+    "@angular-devkit/core": "18.2.9",
+    "@angular-devkit/schematics": "18.2.9",
+    "@angular-eslint/eslint-plugin": "18.4.2",
+    "@angular-eslint/eslint-plugin-template": "18.4.2",
+    "@angular-eslint/template-parser": "18.4.2",
+    "@angular/cli": "18.2.9",
+    "@angular/compiler-cli": "18.2.9",
+    "@angular/language-service": "18.2.9",
+    "@commitlint/cli": "^17.0.0",
+    "@commitlint/config-angular": "^17.0.0",
+    "@commitlint/config-conventional": "^17.3.0",
+    "@cypress/webpack-dev-server": "3.9.0",
+    "@eslint/eslintrc": "^2.1.1",
+    "@eslint/js": "^8.48.0",
+    "@hirez_io/observer-spy": "^2.2.0",
+    "@jscutlery/semver": "^5.0.0",
+    "@ngneat/spectator": "^13.0.0",
+    "@nx/cypress": "19.8.9",
+    "@nx/eslint": "19.8.9",
+    "@nx/eslint-plugin": "19.8.9",
+    "@nx/jest": "19.8.9",
+    "@nx/js": "19.8.9",
+    "@nx/web": "19.8.9",
+    "@nx/workspace": "19.8.9",
+    "@phenomnomnominal/tsquery": "^6.1.3",
+    "@schematics/angular": "18.2.9",
+    "@swc-node/register": "1.9.2",
+    "@swc/core": "1.5.7",
+    "@swc/helpers": "0.5.15",
+    "@types/jest": "29.5.14",
+    "@types/lodash": "^4.14.191",
+    "@types/node": "^18.16.9",
+    "@typescript-eslint/eslint-plugin": "7.18.0",
+    "@typescript-eslint/parser": "7.18.0",
+    "autoprefixer": "^10.4.0",
+    "cypress": "13.16.0",
+    "eslint": "8.57.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-cypress": "2.14.0",
+    "html-webpack-plugin": "^5.5.0",
+    "husky": "^8.0.0",
+    "jest": "29.7.0",
+    "jest-environment-jsdom": "29.7.0",
+    "jest-preset-angular": "14.1.1",
+    "jsonc-eslint-parser": "^2.1.0",
+    "lodash": "^4.17.21",
+    "ng-packagr": "18.2.1",
+    "nx": "19.8.9",
+    "postcss": "^8.4.5",
+    "postcss-import": "~14.1.0",
+    "postcss-preset-env": "~7.5.0",
+    "postcss-url": "~10.1.3",
+    "prettier": "^2.6.2",
+    "rxjs-marbles": "^7.0.1",
+    "ts-jest": "29.1.0",
+    "ts-node": "10.9.1",
+    "typescript": "5.5.4"
+  },
+  "pathMappings": {
+    "@angular-kit/rx-stateful": [
+      "libs/rx-stateful/src/index.ts"
+    ],
+    "@angular-kit/rx-stateful/experimental": [
+      "libs/rx-stateful/experimental/src/index.ts"
+    ],
+    "@angular-kit/rx-stateful/testing": [
+      "libs/rx-stateful/testing/src/index.ts"
+    ]
+  },
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {
+      "demo-rx-stateful": [
+        {
+          "file": "apps/demo-rx-stateful/eslint.config.js",
+          "hash": "7281966788002808118"
+        },
+        {
+          "file": "apps/demo-rx-stateful/jest.config.ts",
+          "hash": "9445210709299187683"
+        },
+        {
+          "file": "apps/demo-rx-stateful/project.json",
+          "hash": "6933136649743187043"
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/all-use-cases/all-use-cases.component.html",
+          "hash": "5416246751232231585"
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/all-use-cases/all-use-cases.component.scss",
+          "hash": "16787339518428299068"
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/all-use-cases/all-use-cases.component.spec.ts",
+          "hash": "5200404116901498431"
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/all-use-cases/all-use-cases.component.ts",
+          "hash": "16174424322227612430",
+          "deps": [
+            "rx-stateful"
+          ]
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/all-use-cases/non-flicker/non-flicker.component.ts",
+          "hash": "16044419344809765496",
+          "deps": [
+            "rx-stateful"
+          ]
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/all-use-cases/rx-stateful-state-visualizer.component.ts",
+          "hash": "10957576275804148902",
+          "deps": [
+            "rx-stateful"
+          ]
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/app.component.spec.ts",
+          "hash": "3550347001847500935"
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/app.component.ts",
+          "hash": "14011669526763358510",
+          "deps": [
+            "rx-stateful"
+          ]
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/app.config.ts",
+          "hash": "1857043208502582298",
+          "deps": [
+            "rx-stateful"
+          ]
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/app.routes.ts",
+          "hash": "5980374200527372157"
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/demos/demo-basic-usage.component.ts",
+          "hash": "14852797388789565533",
+          "deps": [
+            "rx-stateful"
+          ]
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/demos/demo-error-rx-stateful/demo-error-rx-stateful.component.ts",
+          "hash": "14856013151648896276",
+          "deps": [
+            "rx-stateful"
+          ]
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/demos/demo-pagination.component.ts",
+          "hash": "18236869239311553367",
+          "deps": [
+            "rx-stateful"
+          ]
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/demos/demo-rx-stateful/demo-rx-stateful.component.ts",
+          "hash": "4379730617853192697",
+          "deps": [
+            "rx-stateful"
+          ]
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/demos/todo-item.component.ts",
+          "hash": "16259786571670131793"
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/navigation.component.ts",
+          "hash": "2563104962512841114"
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/app/types.ts",
+          "hash": "7893722768494485393"
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/assets/.gitkeep",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/favicon.ico",
+          "hash": "9303420814833116677"
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/index.html",
+          "hash": "17053125508773495879"
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/main.ts",
+          "hash": "2633615247295277217"
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/styles.scss",
+          "hash": "14787000298909736667"
+        },
+        {
+          "file": "apps/demo-rx-stateful/src/test-setup.ts",
+          "hash": "12935735732682149507"
+        },
+        {
+          "file": "apps/demo-rx-stateful/tsconfig.app.json",
+          "hash": "8365644956319658761"
+        },
+        {
+          "file": "apps/demo-rx-stateful/tsconfig.editor.json",
+          "hash": "17511610827034788226"
+        },
+        {
+          "file": "apps/demo-rx-stateful/tsconfig.json",
+          "hash": "12094030803572703611"
+        },
+        {
+          "file": "apps/demo-rx-stateful/tsconfig.spec.json",
+          "hash": "2628739785099261941"
+        }
+      ],
+      "rx-stateful": [
+        {
+          "file": "libs/rx-stateful/CHANGELOG.md",
+          "hash": "11030080768812442426"
+        },
+        {
+          "file": "libs/rx-stateful/README.md",
+          "hash": "8125389690492261385"
+        },
+        {
+          "file": "libs/rx-stateful/eslint.config.js",
+          "hash": "4752150945601236500"
+        },
+        {
+          "file": "libs/rx-stateful/experimental/README.md",
+          "hash": "5685475582876904490"
+        },
+        {
+          "file": "libs/rx-stateful/experimental/ng-package.json",
+          "hash": "12781977952105802458"
+        },
+        {
+          "file": "libs/rx-stateful/experimental/src/index.ts",
+          "hash": "10425863628582473603"
+        },
+        {
+          "file": "libs/rx-stateful/experimental/src/lib/client/config/config-feature.ts",
+          "hash": "15722166802976356074"
+        },
+        {
+          "file": "libs/rx-stateful/experimental/src/lib/client/config/provide-rx-stateful-client.ts",
+          "hash": "7352506647762973063"
+        },
+        {
+          "file": "libs/rx-stateful/experimental/src/lib/client/config/with-config.ts",
+          "hash": "4989205466488080523"
+        },
+        {
+          "file": "libs/rx-stateful/experimental/src/lib/client/rx-stateful-client/rx-stateful-client.service.spec.ts",
+          "hash": "6596883192101523435"
+        },
+        {
+          "file": "libs/rx-stateful/experimental/src/lib/client/rx-stateful-client/rx-stateful-client.service.ts",
+          "hash": "15408526304233298407"
+        },
+        {
+          "file": "libs/rx-stateful/jest.config.ts",
+          "hash": "9905110458472079978"
+        },
+        {
+          "file": "libs/rx-stateful/ng-package.json",
+          "hash": "5825856042202508289"
+        },
+        {
+          "file": "libs/rx-stateful/package.json",
+          "hash": "622442966237174048"
+        },
+        {
+          "file": "libs/rx-stateful/project.json",
+          "hash": "14150855862250609063"
+        },
+        {
+          "file": "libs/rx-stateful/schematics/collection.json",
+          "hash": "145273655696713652"
+        },
+        {
+          "file": "libs/rx-stateful/schematics/migrations.json",
+          "hash": "2729385153383263813"
+        },
+        {
+          "file": "libs/rx-stateful/schematics/migrations/migrate-refreshtrigger/index.spec.ts",
+          "hash": "2872632144348832406"
+        },
+        {
+          "file": "libs/rx-stateful/schematics/migrations/migrate-refreshtrigger/index.ts",
+          "hash": "9236667712166646783"
+        },
+        {
+          "file": "libs/rx-stateful/schematics/migrations/migrate-to-rx-stateful-request/index.spec.ts",
+          "hash": "2263864934098232676"
+        },
+        {
+          "file": "libs/rx-stateful/schematics/migrations/migrate-to-rx-stateful-request/index.ts",
+          "hash": "8552309265627337184"
+        },
+        {
+          "file": "libs/rx-stateful/schematics/migrations/migrate-to-rx-stateful-request/schema.json",
+          "hash": "8400196985755995109"
+        },
+        {
+          "file": "libs/rx-stateful/src/index.ts",
+          "hash": "9333587622090290844"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/config/rx-stateful-config.ts",
+          "hash": "9857492395874456314"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/refetch-strategies/merge-refetch-strategies.spec.ts",
+          "hash": "15297182982973449711"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/refetch-strategies/merge-refetch-strategies.ts",
+          "hash": "6203483796046109719"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/refetch-strategies/refetch-on-auto.strategy.spec.ts",
+          "hash": "13126216325201165588"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/refetch-strategies/refetch-on-auto.strategy.ts",
+          "hash": "9031058981895700193"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/refetch-strategies/refetch-on-trigger.strategy.spec.ts",
+          "hash": "15787842334251856503"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/refetch-strategies/refetch-on-trigger.strategy.ts",
+          "hash": "15167047133074766946"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/refetch-strategies/refetch-strategy.ts",
+          "hash": "5668304533468419576"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/rx-request.spec.ts",
+          "hash": "2813193957831799920"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/rx-request.ts",
+          "hash": "14372963421108466515"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/rx-stateful$.ts",
+          "hash": "12295618354422487051"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/rx-stateful.spec.ts",
+          "hash": "1215739330773383025"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/types/accumulation-fn.ts",
+          "hash": "14030022925379279672"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/types/guards.ts",
+          "hash": "12672614942935316485"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/types/types.ts",
+          "hash": "5768539194339722924"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/util/apply-flattening-operator.ts",
+          "hash": "6514747714406494646"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/util/calc-start-value-for-refresh.spec.ts",
+          "hash": "7478683132047734549"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/util/calc-start-value-for-refresh.ts",
+          "hash": "15668782620981536631"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/util/create-rx-stateful.ts",
+          "hash": "6204629153544186211"
+        },
+        {
+          "file": "libs/rx-stateful/src/lib/util/handle-sync-value.ts",
+          "hash": "9096786531673870140"
+        },
+        {
+          "file": "libs/rx-stateful/src/test-setup.ts",
+          "hash": "4419443500659436732"
+        },
+        {
+          "file": "libs/rx-stateful/testing/README.md",
+          "hash": "3557863727762993998"
+        },
+        {
+          "file": "libs/rx-stateful/testing/ng-package.json",
+          "hash": "12781977952105802458"
+        },
+        {
+          "file": "libs/rx-stateful/testing/src/index.ts",
+          "hash": "15385613691745611181"
+        },
+        {
+          "file": "libs/rx-stateful/testing/src/lib/mock-rx-stateful$.ts",
+          "hash": "3693960347726739670"
+        },
+        {
+          "file": "libs/rx-stateful/testing/src/lib/mock-rx-stateful.spec.ts",
+          "hash": "9161209607345314993"
+        },
+        {
+          "file": "libs/rx-stateful/tsconfig.json",
+          "hash": "15487755565970508470"
+        },
+        {
+          "file": "libs/rx-stateful/tsconfig.lib.json",
+          "hash": "1433058402165730277"
+        },
+        {
+          "file": "libs/rx-stateful/tsconfig.lib.prod.json",
+          "hash": "174503844014784742"
+        },
+        {
+          "file": "libs/rx-stateful/tsconfig.schematics.json",
+          "hash": "14415453884682121147"
+        },
+        {
+          "file": "libs/rx-stateful/tsconfig.spec.json",
+          "hash": "1779110203487732246"
+        }
+      ]
+    },
+    "nonProjectFiles": [
+      {
+        "file": ".commitlintrc.json",
+        "hash": "17278173993206928262"
+      },
+      {
+        "file": ".editorconfig",
+        "hash": "5443105041930014821"
+      },
+      {
+        "file": ".env",
+        "hash": "5238204894158769644"
+      },
+      {
+        "file": ".github/workflows/azure-static-web-apps-salmon-river-0283bb503.yml",
+        "hash": "14403960791428444128"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "5938557614466102241"
+      },
+      {
+        "file": ".husky/commit-msg",
+        "hash": "13783233003910220812"
+      },
+      {
+        "file": ".prettierignore",
+        "hash": "13478055348237090294"
+      },
+      {
+        "file": ".prettierrc",
+        "hash": "14065848563569097632"
+      },
+      {
+        "file": "CONTRIBUTING.md",
+        "hash": "8522869509826861940"
+      },
+      {
+        "file": "README.md",
+        "hash": "8125389690492261385"
+      },
+      {
+        "file": "decorate-angular-cli.js",
+        "hash": "11591942401042673416"
+      },
+      {
+        "file": "eslint.config.js",
+        "hash": "2473568228554428639"
+      },
+      {
+        "file": "jest.config.ts",
+        "hash": "1697967922403481452"
+      },
+      {
+        "file": "jest.preset.js",
+        "hash": "9084884494335109525"
+      },
+      {
+        "file": "nx.json",
+        "hash": "3109097987892880741"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "216746207761014950"
+      },
+      {
+        "file": "package.json",
+        "hash": "17705561624760561149"
+      },
+      {
+        "file": "todo.md",
+        "hash": "16678294268575007358"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "12483379502412331549"
+      }
+    ]
+  }
+}

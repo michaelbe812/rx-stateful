@@ -2,7 +2,7 @@ import {Component, inject} from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {MatButtonModule} from "@angular/material/button";
 import {async, delay, Subject} from "rxjs";
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import {rxStateful$, withAutoRefetch, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
 import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";

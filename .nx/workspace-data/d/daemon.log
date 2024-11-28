@@ -1,0 +1,44 @@
+[NX Daemon Server] - 2024-11-28T08:30:19.738Z - Started listening on: /var/folders/zz/1g9r9qqn6mz6832tyf3z8kz80000gn/T/8ed018771b646f6255d1/d.sock
+[NX Daemon Server] - 2024-11-28T08:30:19.740Z - [WATCHER]: Subscribed to changes within: /Users/michaelberger/Desktop/angular-kit-rx-stateful (native)
+[NX Daemon Server] - 2024-11-28T08:30:19.744Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-11-28T08:30:19.745Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2024-11-28T08:30:19.746Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-11-28T08:30:19.746Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2024-11-28T08:30:19.747Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2024-11-28T08:30:19.747Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2024-11-28T08:30:19.748Z - [WATCHER]: Stopping the watcher for /Users/michaelberger/Desktop/angular-kit-rx-stateful (sources)
+[NX Daemon Server] - 2024-11-28T08:30:19.748Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-11-28T08:30:19.748Z - [WATCHER]: Stopping the watcher for /Users/michaelberger/Desktop/angular-kit-rx-stateful (outputs)
+[NX Daemon Server] - 2024-11-28T08:32:22.229Z - Started listening on: /var/folders/zz/1g9r9qqn6mz6832tyf3z8kz80000gn/T/8ed018771b646f6255d1/d.sock
+[NX Daemon Server] - 2024-11-28T08:32:22.231Z - [WATCHER]: Subscribed to changes within: /Users/michaelberger/Desktop/angular-kit-rx-stateful (native)
+[NX Daemon Server] - 2024-11-28T08:32:22.232Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-11-28T08:32:22.232Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2024-11-28T08:32:22.233Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-11-28T08:32:22.234Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2024-11-28T08:32:22.234Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2024-11-28T08:32:22.234Z - Handled FORCE_SHUTDOWN. Handling time: 1. Response time: 0.
+[NX Daemon Server] - 2024-11-28T08:32:22.236Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-11-28T08:32:22.236Z - [WATCHER]: Stopping the watcher for /Users/michaelberger/Desktop/angular-kit-rx-stateful (sources)
+[NX Daemon Server] - 2024-11-28T08:32:22.236Z - [WATCHER]: Stopping the watcher for /Users/michaelberger/Desktop/angular-kit-rx-stateful (outputs)
+[NX Daemon Server] - 2024-11-28T08:33:02.772Z - Started listening on: /var/folders/zz/1g9r9qqn6mz6832tyf3z8kz80000gn/T/8ed018771b646f6255d1/d.sock
+[NX Daemon Server] - 2024-11-28T08:33:02.774Z - [WATCHER]: Subscribed to changes within: /Users/michaelberger/Desktop/angular-kit-rx-stateful (native)
+[NX Daemon Server] - 2024-11-28T08:33:02.780Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-11-28T08:33:02.780Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2024-11-28T08:33:02.781Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-11-28T08:33:02.782Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2024-11-28T08:33:02.782Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2024-11-28T08:33:02.782Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 0.
+[NX Daemon Server] - 2024-11-28T08:33:02.784Z - [WATCHER]: Stopping the watcher for /Users/michaelberger/Desktop/angular-kit-rx-stateful (sources)
+[NX Daemon Server] - 2024-11-28T08:33:02.784Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-11-28T08:33:02.784Z - [WATCHER]: Stopping the watcher for /Users/michaelberger/Desktop/angular-kit-rx-stateful (outputs)
+[NX Daemon Server] - 2024-11-28T08:33:05.631Z - Started listening on: /var/folders/zz/1g9r9qqn6mz6832tyf3z8kz80000gn/T/8ed018771b646f6255d1/d.sock
+[NX Daemon Server] - 2024-11-28T08:33:05.633Z - [WATCHER]: Subscribed to changes within: /Users/michaelberger/Desktop/angular-kit-rx-stateful (native)
+[NX Daemon Server] - 2024-11-28T08:33:05.640Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-11-28T08:33:05.641Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2024-11-28T08:33:05.642Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-11-28T08:33:05.642Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2024-11-28T08:33:05.642Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2024-11-28T08:33:05.642Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 0.
+[NX Daemon Server] - 2024-11-28T08:33:05.644Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-11-28T08:33:05.644Z - [WATCHER]: Stopping the watcher for /Users/michaelberger/Desktop/angular-kit-rx-stateful (sources)
+[NX Daemon Server] - 2024-11-28T08:33:05.644Z - [WATCHER]: Stopping the watcher for /Users/michaelberger/Desktop/angular-kit-rx-stateful (outputs)

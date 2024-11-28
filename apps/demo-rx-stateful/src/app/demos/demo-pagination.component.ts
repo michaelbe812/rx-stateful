@@ -2,7 +2,7 @@ import {Component, inject, ViewChild, AfterViewInit} from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {MatExpansionModule} from "@angular/material/expansion";
 import {HighlightModule} from "ngx-highlightjs";
-import {HttpClient} from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import {BehaviorSubject, delay, Observable, scan, Subject, switchMap} from "rxjs";
 import {MatPaginator, MatPaginatorModule} from "@angular/material/paginator";
 import {MatTableDataSource, MatTableModule} from "@angular/material/table";
