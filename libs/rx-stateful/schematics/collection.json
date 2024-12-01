@@ -1,10 +1,10 @@
 {
   "$schema": "../../../node_modules/@angular-devkit/schematics/collection-schema.json",
   "schematics": {
-    "migrate-to-rx-stateful-request": {
-      "description": "Migrates from rxStateful$ to rxStatefulRequest",
-      "factory": "./src/migrations/migrate-to-rx-stateful-request",
-      "schema": "./src/migrations/migrate-to-rx-stateful-request/schema.json"
+    "migrate-to-rx-request": {
+      "description": "Migrates from rxStateful$ to rxRequest",
+      "factory": "./src/migrations/migrate-to-rx-request",
+      "schema": "./src/migrations/migrate-to-rx-request/schema.json"
     },
     "migrate-refresh-trigger": {
       "description": "Migrate refreshTrigger$ to refetchStrategies",

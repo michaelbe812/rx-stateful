@@ -41,10 +41,10 @@ export default function(): Rule {
           }
         });
 
-      // Step 2: Replace rxStateful$ with rxStatefulRequest
+      // Step 2: Replace rxStateful$ with rxRequest
       newContent = replace(newContent,
         'CallExpression > Identifier[name="rxStateful$"]',
-        () => 'rxStatefulRequest'
+        () => 'rxRequest'
       );
 
       // Step 3: Transform pipe operations

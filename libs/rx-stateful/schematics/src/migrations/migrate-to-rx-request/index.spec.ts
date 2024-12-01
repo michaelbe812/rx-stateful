@@ -22,7 +22,7 @@ describe('migrate-to-rx-stateful-request', () => {
     const newTree = await runner.runSchematic('migrate-to-rx-stateful-request', {}, tree);
     const content = newTree.readContent('/test.ts');
 
-    expect(content).toBe(`const state$ = rxStatefulRequest(of(null));`);
+    expect(content).toBe(`const state$ = rxRequest(of(null));`);
   });
 
   it('should migrate rxStateful$ with config', async () => {
@@ -34,7 +34,7 @@ describe('migrate-to-rx-stateful-request', () => {
     const newTree = await runner.runSchematic('migrate-to-rx-stateful-request', {}, tree);
     const content = newTree.readContent('/test.ts');
 
-    expect(content).toBe(`const state$ = rxStatefulRequest(of(null), { keepValueOnRefresh: true });`);
+    expect(content).toBe(`const state$ = rxRequest(of(null), { keepValueOnRefresh: true });`);
   });
 
   it('should migrate rxStateful$ with source function', async () => {
@@ -46,7 +46,7 @@ describe('migrate-to-rx-stateful-request', () => {
     const newTree = await runner.runSchematic('migrate-to-rx-stateful-request', {}, tree);
     const content = newTree.readContent('/test.ts');
 
-    expect(content).toBe(`const state$ = rxStatefulRequest((arg: string) => of(arg), { sourceTriggerConfig: { trigger: trigger$ } });`);
+    expect(content).toBe(`const state$ = rxRequest((arg: string) => of(arg), { sourceTriggerConfig: { trigger: trigger$ } });`);
   });
 
   it('should migrate derived value access', async () => {
@@ -60,7 +60,7 @@ describe('migrate-to-rx-stateful-request', () => {
     const content = newTree.readContent('/test.ts');
 
     expect(content).toBe(
-      `const state$ = rxStatefulRequest(of(null));
+      `const state$ = rxRequest(of(null));
        const value$ = state$.value$().pipe(map(v => v.value));`
     );
   });
@@ -81,7 +81,7 @@ describe('migrate-to-rx-stateful-request', () => {
     expect(content).toBe(
       `@Component({})
        class TestComponent {
-         state$ = rxStatefulRequest(of(null));
+         state$ = rxRequest(of(null));
          value$ = this.state$.value$().pipe(map(v => v.value));
        }`
     );
@@ -100,8 +100,8 @@ describe('migrate-to-rx-stateful-request', () => {
     const content = newTree.readContent('/test.ts');
 
     expect(content).toBe(
-      `const state1$ = rxStatefulRequest(of(1));
-       const state2$ = rxStatefulRequest(of(2));
+      `const state1$ = rxRequest(of(1));
+       const state2$ = rxRequest(of(2));
        const value1$ = state1$.value$().pipe(map(v => v.value));
        const value2$ = state2$.value$().pipe(map(v => v.value));`
     );
@@ -154,7 +154,7 @@ describe('migrate-to-rx-stateful-request', () => {
     const content = newTree.readContent('/test.ts');
 
     expect(content).toBe(
-      `const state$ = rxStatefulRequest(of(null), { refetchStrategies: [withRefetchOnTrigger(trigger$)] });`
+      `const state$ = rxRequest(of(null), { refetchStrategies: [withRefetchOnTrigger(trigger$)] });`
     );
   });
 });
