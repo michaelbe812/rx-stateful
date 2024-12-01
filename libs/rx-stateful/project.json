@@ -4,12 +4,13 @@
   "projectType": "library",
   "sourceRoot": "libs/rx-stateful/src",
   "prefix": "angular-kit",
+  "tags": [],
   "targets": {
-      "build-lib": {
+    "build-lib": {
       "executor": "@nx/angular:package",
       "options": {
         "tsConfig": "libs/rx-stateful/tsconfig.lib.json",
-       "project": "libs/rx-stateful/ng-package.json"
+        "project": "libs/rx-stateful/ng-package.json"
       },
       "configurations": {
         "production": {
@@ -55,6 +56,5 @@
         "preset": "angular"
       }
     }
-  },
-  "tags": []
+  }
 }
