@@ -11,13 +11,39 @@ export default function(): Rule {
       const sourceText = content.toString();
       if (!sourceText.includes('refreshTrigger$')) return;
 
-      const newContent = transformRefreshTrigger(sourceText);
+      const needsImport = !sourceText.includes('withRefetchOnTrigger');
+      let newContent = transformRefreshTrigger(sourceText);
+
+      if (needsImport) {
+        newContent = addWithRefetchOnTriggerImport(newContent);
+      }
+
       if (newContent !== sourceText) {
         tree.overwrite(filePath, newContent);
       }
     });
     return tree;
   };
+}
+
+function addWithRefetchOnTriggerImport(sourceText: string): string {
+  const importStatement = "import { withRefetchOnTrigger } from '@angular-kit/rx-stateful';";
+
+  // Check if there are existing imports from @angular-kit/rx-stateful
+  const existingImportRegex = /import\s*{([^}]*)}\s*from\s*['"]@angular-kit\/rx-stateful['"];/;
+  const existingImportMatch = sourceText.match(existingImportRegex);
+
+  if (existingImportMatch) {
+    // Append to existing import
+    const existingImports = existingImportMatch[1];
+    const newImports = existingImports.includes('withRefetchOnTrigger')
+      ? existingImports
+      : `${existingImports}, withRefetchOnTrigger`;
+    return sourceText.replace(existingImportRegex, `import { ${newImports} } from '@angular-kit/rx-stateful';`);
+  }
+
+  // Add new import statement at the top of the file
+  return `${importStatement}\n${sourceText}`;
 }
 
 function transformRefreshTrigger(sourceText: string): string {
@@ -32,7 +58,7 @@ function transformRefreshTrigger(sourceText: string): string {
   result = result.replace(
     /rxStateful\$\((.*?),\s*{\s*refreshTrigger\$:\s*(.*?)\s*}\)/g,
     (_, source, trigger) =>
-      `rxStatefulRequest(${source}, {refetchStrategies: [withRefetchOnTrigger(${trigger})]})`
+      `rxStateful$(${source}, { refetchStrategies: [withRefetchOnTrigger(${trigger})] })`
   );
 
   return result;
