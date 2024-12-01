@@ -32,11 +32,19 @@ export type RxStatefulLoader<T,A,E> = {
 /**
  * @publicApi
  *
+ * @description
+ * Function to create a stateful request object which can be used to trigger a request and handle the state of the request.
+ * The requestFn is called with the trigger value if a trigger is provided.
+ * The requestFn is called without a value if no trigger is provided.
+ *
  * @example
  * const sourceTrigger$$ = new Subject<string>()
- * const rxStateful$ = rxStateful$((arg: string) => httpClient.get(`https://my-api.com/${arg}`), { keepValueOnRefresh: true, sourceTriggerConfig: {trigger: sourceTrigger$$}})
- * @param sourceFn$
- * @param sourceTriggerConfig
+ * const rxRequest = rxRequest({
+ *  requestFn: (arg: string) => httpClient.get(`https://my-api.com/${arg}`),
+ *  trigger: sourceTrigger$$,
+ *  config: {keepValueOnRefresh: true}
+ * })
+ * @param loaderOptions
  */
 export function rxRequest<T,A, E = unknown>(loaderOptions: RxStatefulLoader<T, A, E>): RxRequest<T, E>{
   const {requestFn, trigger, config} = loaderOptions;
