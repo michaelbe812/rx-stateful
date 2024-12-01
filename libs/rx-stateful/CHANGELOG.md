@@ -2,6 +2,21 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.0.0-rc.0](https://github.com/michaelbe812/angular-kit-rx-stateful/compare/rx-stateful-1.7.0...rx-stateful-2.0.0-rc.0) (2024-12-01)
+
+
+### Features
+
+* add migration for removed refreshTrigger$ option ([6a933b9](https://github.com/michaelbe812/angular-kit-rx-stateful/commit/6a933b96aa7cb82a40ca93911101625f9a85fcee))
+* add migration to rxStatefulRequest ([b51be33](https://github.com/michaelbe812/angular-kit-rx-stateful/commit/b51be332b7e92e33965a754c5db04cc8d53623e4))
+* introduce RxStatefulRequest ([7b30631](https://github.com/michaelbe812/angular-kit-rx-stateful/commit/7b306319ab50639840b29335e84852157e164086))
+* introduce separate rxStatefulRequest ([eedf6d5](https://github.com/michaelbe812/angular-kit-rx-stateful/commit/eedf6d52759be426b26a7184871ce01b8e70f106))
+* **rx-stateful:** create ergonomic API with RxStatefulLoader for rxStatefulRequest ([854d6ad](https://github.com/michaelbe812/angular-kit-rx-stateful/commit/854d6ad352fbba4d9356379eaef4b55e2fa29808))
+* **rx-stateful:** separate global config for RxStatefulClient ([bd89451](https://github.com/michaelbe812/angular-kit-rx-stateful/commit/bd8945158664dfdc63e3ce6c0f1e812a2902df82))
+* use global config in rxstateful-functions ([5c3b2b6](https://github.com/michaelbe812/angular-kit-rx-stateful/commit/5c3b2b6585de34a9c8599e1d634ec7d7fdc9ad0e))
+
+
+
 # [1.8.0](https://github.com/michaelbe812/angular-kit-rx-stateful/compare/rx-stateful-1.7.0...rx-stateful-1.8.0) (2024-12-01)
 
 
