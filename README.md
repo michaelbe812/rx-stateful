@@ -1,6 +1,6 @@
 # @angular-kit/rx-stateful
 
-`rxStateful$` is a powerful RxJs operator that wraps any sync or async Observable and provides a
+`rxStateful$` is a powerful RxJs operator that wraps async Observable and provides a
 stateful stream. It does offer out of the box
 
 - 🔄 loading state
@@ -9,8 +9,6 @@ stateful stream. It does offer out of the box
 - 🔴 multicasted stream
 - ⚙️ powerful configuration possibilities e.g. to keep the last value on refresh
 - ⚡️ non-flickering loading state for great UX
-
-Hint: You can use it on both sync and async Observables. However the real benefits you will get for async Observables.
 
 ## Installation
 ```bash
@@ -24,23 +22,48 @@ pnpm add @angular-kit/rx-stateful
 A live demo is available on [here](https://salmon-river-0283bb503.4.azurestaticapps.net)
 
 ## Usage
-### `rxStateful$` as standalone function
-#### Sync source Observable
-```typescript
-import { rxStateful$ } from '@angular-kit/rx-stateful';
+### `rxRequest` standalone function
+> [!TIP]
+> rxRequest is basically the same as rxStateful$ but with a more ergonomic API. It is recommended to use `rxRequest` instead of `rxStateful$`.
 
+#### Basic Usage
+```typescript
+import { rxRequest } from '@angular-kit/rx-stateful';
+
+
+const req = rxRequest({
+    // optional trigger. If given the requestFn will only be executed if the trigger emits. If not given the requestFn will be executed immediately on subscribe
+    trigger: trigger$,
+    // the request function. This can be a function that returns an Observable e.g. vrom an http call
+    requestFn: () => from(fetch('...')),
+    config: {...}
+})
+
+// get the state stream
 /**
- * Sync Observable will return: 
+ * Async Observable will return: 
  * [
- * { value: 1, hasValue: true, context: 'next', hasError: false, error: undefined },
- * { value: 2, hasValue: true, context: 'next', hasError: false, error: undefined },
- * { value: 3, hasValue: true, context: 'next', hasError: false, error: undefined },
+ * { value: null, hasValue: false, context: 'suspense', hasError: false, error: undefined },
+ * { value: SOME_VALUE, hasValue: true, context: 'next', hasError: false, error: undefined },
  * ]
  */
-const stateful$ = rxStateful$(of(1, 2, 3));
+const value$ = req.value$();
+
 ```
 
-#### Async source Observable
+### API
+`rxRequest.value$()` returns a Observable of with following properties:
+- `value` - the value
+- `hasValue` - boolean if a value is present
+- `context` - the context of the stream ('suspense', 'next', 'error', 'complete')
+- `hasError` - boolean if an error is present
+- `error` - the error, if present
+- `isSuspense` - suspense/loading state
+
+`rxRequest.refresh()` offers a convenient way to trigger a refresh of the source. It will trigger the source again and emit the new states.
+
+### `rxStateful$` standalone function
+
 #### Basic Usage
 ```typescript
 import { rxStateful$ } from '@angular-kit/rx-stateful';
@@ -81,14 +104,18 @@ const stateful$ = rxStateful$((id: number) => from(fetch(`.../${id}`)), {
 - `isSuspense` - suspense/loading state
 
 
-### Configuration
-`rxStateful$` provides configuration possibility on instance level:
+### Configuration of `rxStateful$` or `rxRequest`
+Both `rxRequest` and `rxStateful$` provides configuration possibility on instance level or globally.
+
+#### Global configuration
+You can provide a global configuration for `rxStateful$` and `rxRequest`. This configuration will be used for every instance of `rxStateful$` and `rxRequest`.
+
+Use `provideRxStatefulConfig` in either your `AppModule` or `appConfig` to provide a global configuration.
 
 #### Configuration on instance level
 
 You can also provide a configuration on instance level. This will also override the global configuration (if present).
 
-`rxStateful$` takes a configuration object as second parameter. The following options are available:
 - `keepValueOnRefresh` - boolean if the value should be kept when the `refreshTrigger$` emits. Default: `false`
 - `keepErrorOnRefresh` - boolean if thel last error should be kept when the `refreshTrigger$` emits. Default: `false`
 - `refreshTrigger$` - a Subject or Observable that triggers the source again. Default: not set. *deprecated* use `refetchStrategies`
@@ -113,15 +140,19 @@ You can also provide a configuration on instance level. This will also override 
 
 ##### Configuration Example
 ```typescript
-import { rxStateful$ } from '@angular-kit/rx-stateful';
+import { rxStateful$, rxRequest } from '@angular-kit/rx-stateful';
 
 const rxStateful$ = rxStateful$(someSource$, { keepValueOnRefresh: true });
+const rxRequest = rxRequest({ requestFn: () => someSource$, config: { keepValueOnRefresh: true } });
 ```
 ##### `refetchStrategies`
 - `withRefetchOnTrigger`
 - `withAutoRefetch`
 
 ### Usage via `RxStatefulClient`
+> [!CAUTION]
+> The `RxStatefulClient` is a experimental feature. Breaking changes might occur in any version update.
+
 In order to use `RxStatefulClient` you first need to provide it, e.g. in your `AppModule`:
 
 ```typescript
@@ -183,7 +214,10 @@ Please have a look at the [testing documentation](./testing/README.md).
 ## Versioning
 This project follows [Semantic Versioning](https://semver.org/).
 
-- Version `1.x.x` supports Angular >=14.0.0
+
+## Angular Compatibility
+- Version `2.x.x` requires Angular >=18.0.0
+- Version `1.x.x` requires Angular >=14.0.0
 
 ## License
 MIT
