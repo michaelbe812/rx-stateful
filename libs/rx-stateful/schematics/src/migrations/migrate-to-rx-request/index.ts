@@ -1,10 +1,9 @@
 import { Rule, Tree } from '@angular-devkit/schematics';
-import { ast, match, replace } from '@phenomnomnominal/tsquery';
-import { Node } from 'typescript';
 
-export default function(): Rule {
+export default function migrate(): Rule {
   return (tree: Tree) => {
     tree.visit((filePath) => {
+      if (filePath.includes('node_modules')) return;
       if (!filePath.endsWith('.ts')) return;
 
       const content = tree.read(filePath);
@@ -13,77 +12,93 @@ export default function(): Rule {
       const sourceText = content.toString();
       if (!sourceText.includes('rxStateful$')) return;
 
-      const sourceFile = ast(sourceText);
-      let newContent = sourceText;
-
-      // Step 1: Find all rxStateful$ variables and their usages
-      const rxStatefulVars = new Set<string>();
-
-      // Find variable declarations
-      match(sourceFile, 'VariableDeclaration')
-        .forEach(declaration => {
-          if (match(declaration, 'CallExpression > Identifier[name="rxStateful$"]').length > 0) {
-            const identifier = match(declaration, 'Identifier')[0];
-            if (identifier) {
-              rxStatefulVars.add(identifier.getText());
-            }
-          }
-        });
-
-      // Find class property declarations
-      match(sourceFile, 'PropertyDeclaration')
-        .forEach(declaration => {
-          if (match(declaration, 'CallExpression > Identifier[name="rxStateful$"]').length > 0) {
-            const identifier = match(declaration, 'Identifier')[0];
-            if (identifier) {
-              rxStatefulVars.add(identifier.getText());
-            }
-          }
-        });
-
-      // Step 2: Replace rxStateful$ with rxRequest
-      newContent = replace(newContent,
-        'CallExpression > Identifier[name="rxStateful$"]',
-        () => 'rxRequest'
-      );
-
-      // Step 3: Transform pipe operations
-      rxStatefulVars.forEach(varName => {
-        // Handle direct variable usage
-        newContent = replace(newContent,
-          `CallExpression[expression.expression.name="${varName}"]`,
-          (node: Node) => {
-            const text = node.getText();
-            if (!text.includes('.pipe(')) return text;
-            return text.replace(`${varName}.pipe`, `${varName}.value$().pipe`);
-          }
-        );
-
-        // Handle this.variable usage
-        newContent = replace(newContent,
-          `CallExpression[expression.expression.expression.kind="ThisKeyword"][expression.expression.name="${varName}"]`,
-          (node: Node) => {
-            const text = node.getText();
-            if (!text.includes('.pipe(')) return text;
-            return text.replace(`this.${varName}.pipe`, `this.${varName}.value$().pipe`);
-          }
-        );
-      });
-
-      // Step 4: Transform refreshTrigger$ to refetchStrategies
-      newContent = replace(newContent,
-        'ObjectLiteralExpression > PropertyAssignment[name.name="refreshTrigger$"]',
-        (node: Node) => {
-          const triggerValue = match(node, 'PropertyAssignment > Identifier')[1];
-          if (!triggerValue) return node.getText();
-          return `refetchStrategies: [withRefetchOnTrigger(${triggerValue.getText()})]`;
-        }
-      );
-
+      let newContent = transformRxStateful(sourceText);
       if (newContent !== sourceText) {
+        newContent = ensureImport(newContent);
         tree.overwrite(filePath, newContent);
       }
     });
     return tree;
   };
+}
+
+function hasRxRequestImport(sourceText: string): boolean {
+  const importRegex = /import\s*{([^}]*)}\s*from\s*['"]@angular-kit\/rx-stateful['"];?/;
+  const match = sourceText.match(importRegex);
+  if (!match) return false;
+  return match[1].split(',').some(name => name.trim() === 'rxRequest');
+}
+
+function ensureImport(sourceText: string): string {
+  // Return unchanged if rxRequest is already imported
+  if (hasRxRequestImport(sourceText)) {
+    return sourceText;
+  }
+
+  // Find existing @angular-kit/rx-stateful import
+  const importRegex = /import\s*{([^}]*)}\s*from\s*['"]@angular-kit\/rx-stateful['"];?/;
+  const importMatch = sourceText.match(importRegex);
+
+  if (importMatch) {
+    // Add rxRequest to existing import
+    const existingImports = importMatch[1].trim();
+    const newImports = existingImports ? `${existingImports}, rxRequest` : 'rxRequest';
+    return sourceText.replace(
+      importRegex,
+      `import { ${newImports} } from '@angular-kit/rx-stateful';`
+    );
+  }
+
+  // Add new import at the start, after any existing imports
+  const lastImportIndex = findLastImportIndex(sourceText);
+  if (lastImportIndex !== -1) {
+    return (
+      sourceText.slice(0, lastImportIndex) +
+      "\nimport { rxRequest } from '@angular-kit/rx-stateful';\n" +
+      sourceText.slice(lastImportIndex)
+    );
+  }
+
+  // No existing imports, add at the start of the file
+  return `import { rxRequest } from '@angular-kit/rx-stateful';\n\n${sourceText}`;
+}
+
+function findLastImportIndex(sourceText: string): number {
+  const importRegex = /^import.*?;?\s*$/gm;
+  let lastIndex = -1;
+  let match;
+
+  while ((match = importRegex.exec(sourceText)) !== null) {
+    lastIndex = match.index + match[0].length;
+  }
+
+  return lastIndex;
+}
+
+function transformRxStateful(sourceText: string): string {
+  // Transform pattern with sourceTriggerConfig
+  let result = sourceText.replace(
+    /rxStateful\$\((.*?)\s*=>\s*(.*?),\s*{\s*sourceTriggerConfig:\s*{\s*trigger:\s*(.*?)\s*}\s*}\)/g,
+    (_, param, source, trigger) =>
+      `rxRequest({
+    trigger: ${trigger},
+    requestFn: (${param}) => ${source},
+  }).value$()`
+  );
+
+  // Transform pattern with regular config
+  result = result.replace(
+    /rxStateful\$\((.*?),\s*{([^}]*)}\)/g,
+    (match, source, config) => {
+      // Skip if this is a function with arrow syntax (already handled by first replacement)
+      if (source.includes('=>')) return match;
+
+      return `rxRequest({
+    requestFn: () => ${source},
+    config: {${config}}
+  }).value$()`;
+    }
+  );
+
+  return result;
 }

@@ -3,8 +3,7 @@
   "schematics": {
     "migrate-to-rx-request": {
       "description": "Migrates from rxStateful$ to rxRequest",
-      "factory": "./src/migrations/migrate-to-rx-request",
-      "schema": "./src/migrations/migrate-to-rx-request/schema.json"
+      "factory": "./src/migrations/migrate-to-rx-request/index"
     },
     "migrate-refresh-trigger": {
       "description": "Migrate refreshTrigger$ to refetchStrategies",
