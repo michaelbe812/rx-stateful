@@ -59,6 +59,7 @@
     "@jscutlery/semver": "^5.3.0",
     "@ngneat/spectator": "^13.0.0",
     "@nx/cypress": "19.8.9",
+    "@nx/devkit": "^19.8.9",
     "@nx/eslint": "19.8.9",
     "@nx/eslint-plugin": "19.8.9",
     "@nx/jest": "19.8.9",
