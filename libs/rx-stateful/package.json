@@ -31,5 +31,6 @@
   },
   "ng-update": {
     "migrations": "./schematics/migration.json"
-  }
+  },
+  "schematics": "./schematics/collection.json"
 }
