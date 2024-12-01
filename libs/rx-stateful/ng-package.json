@@ -3,5 +3,6 @@
   "dest": "../../dist/libs/rx-stateful",
   "lib": {
     "entryFile": "src/index.ts"
-  }
+  },
+  "allowedNonPeerDependencies": ["ts-query"]
 }

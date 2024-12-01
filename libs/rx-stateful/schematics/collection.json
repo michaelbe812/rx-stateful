@@ -3,8 +3,8 @@
   "schematics": {
     "migrate-to-rx-stateful-request": {
       "description": "Migrates from rxStateful$ to rxStatefulRequest",
-      "factory": "./migrations/migrate-to-rx-stateful-request",
-      "schema": "./migrations/migrate-to-rx-stateful-request/schema.json"
+      "factory": "./src/migrations/migrate-to-rx-stateful-request",
+      "schema": "./src/migrations/migrate-to-rx-stateful-request/schema.json"
     }
   }
 }

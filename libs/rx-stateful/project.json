@@ -5,11 +5,11 @@
   "sourceRoot": "libs/rx-stateful/src",
   "prefix": "angular-kit",
   "targets": {
-    "build": {
+      "build-lib": {
       "executor": "@nx/angular:package",
-      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
       "options": {
-        "project": "libs/rx-stateful/ng-package.json"
+        "tsConfig": "libs/rx-stateful/tsconfig.lib.json",
+       "project": "libs/rx-stateful/ng-package.json"
       },
       "configurations": {
         "production": {
@@ -19,7 +19,24 @@
           "tsConfig": "libs/rx-stateful/tsconfig.lib.json"
         }
       },
-      "defaultConfiguration": "production"
+      "defaultConfiguration": "production",
+      "outputs": ["{workspaceRoot}/dist/libs/rx-stateful"],
+      "dependsOn": ["^build"]
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build-lib"],
+      "options": {
+        "commands": [
+          "tsc -p libs/rx-stateful/tsconfig.schematics.json",
+          "npx cpx libs/rx-stateful/schematics/collection.json dist/libs/rx-stateful/schematics",
+          "npx cpx libs/rx-stateful/schematics/migration.json dist/libs/rx-stateful/schematics",
+          "npx cpx libs/rx-stateful/schematics/src/**/files/** dist/libs/rx-stateful/schematics/src",
+          "npx cpx libs/rx-stateful/schematics/src/**/schema.json dist/libs/rx-stateful/schematics/src"
+        ],
+        "parallel": false
+      },
+      "outputs": ["{workspaceRoot}/dist/libs/state/schematics"]
     },
     "test": {
       "executor": "@nx/jest:jest",
