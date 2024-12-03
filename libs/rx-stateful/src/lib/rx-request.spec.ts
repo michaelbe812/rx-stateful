@@ -23,7 +23,6 @@ describe(rxRequest.name, () => {
     describe('Observable Signature', () => {
       test('should not emit a suspense = true state for sync observable', () => {
         runWithTestScheduler(({ expectObservable }) => {
-          // const source$ = rxStatefulRequest(of(1), defaultConfig);
           const source$ = rxRequest({
             requestFn: () => of(1),
             config: defaultConfig,
@@ -55,10 +54,6 @@ describe(rxRequest.name, () => {
             const s$ = cold('-a|', { a: 1 });
             const refresh$ = cold('---a-', { a: void 0 });
             const expected = 'sa-sb-';
-            // const source$ = rxStatefulRequest(s$, {
-            //   ...defaultConfig,
-            //   refetchStrategies: withRefetchOnTrigger(refresh$)
-            // });
             const source$ = rxRequest({
               requestFn: () => s$,
               config: {
@@ -164,12 +159,6 @@ describe(rxRequest.name, () => {
       test('should not emit a suspense = true state for sync observables', () => {
         runWithTestScheduler(({ expectObservable, cold }) => {
           const trigger = cold('a--b', { a: 1, b: 2 });
-          // const source$ = rxStatefulRequest((n) => of(n), {
-          //   ...defaultConfig,
-          //   sourceTriggerConfig: {
-          //     trigger,
-          //   },
-          // });
           const source$ = rxRequest({
             trigger,
             requestFn: (n) => of(n),
@@ -221,13 +210,6 @@ describe(rxRequest.name, () => {
           const s$ = (n: number) => cold('-a', { a: n });
           const expected = '-sasa--sb';
 
-          // const source$ = rxStatefulRequest((n) => s$(n), {
-          //   ...defaultConfig,
-          //   refetchStrategies: [withRefetchOnTrigger(refresh)],
-          //   sourceTriggerConfig: {
-          //     trigger,
-          //   },
-          // });
           const source$ = rxRequest({
             trigger,
             requestFn: (n) => s$(n),
@@ -283,14 +265,6 @@ describe(rxRequest.name, () => {
           const s$ = (n: number) => cold('-a', { a: n });
           const expected = '-zaxa--xb';
 
-          // const source$ = rxStatefulRequest((n) => s$(n), {
-          //   ...defaultConfig,
-          //   keepValueOnRefresh: true,
-          //   refetchStrategies: [withRefetchOnTrigger(refresh)],
-          //   sourceTriggerConfig: {
-          //     trigger,
-          //   },
-          // });
           const source$ = rxRequest({
             trigger,
             requestFn: (n) => s$(n),
@@ -347,10 +321,7 @@ describe(rxRequest.name, () => {
               const s$ = cold('-#', {}, error);
               const refresh$ = cold('---a-', { a: void 0 });
               const expected = 'sa-sa-';
-              // const source$ = rxStatefulRequest(s$, {
-              //   ...defaultConfig,
-              //   refetchStrategies: [withRefetchOnTrigger(refresh$)],
-              // });
+
               const source$ = rxRequest({
                 requestFn: () => s$,
                 config: {
@@ -388,11 +359,7 @@ describe(rxRequest.name, () => {
               const s$ = cold('-#', {}, error);
               const refresh$ = cold('---a-', { a: void 0 });
               const expected = 'za-ya-';
-              // const source$ = rxStatefulRequest(s$, {
-              //   ...defaultConfig,
-              //   keepErrorOnRefresh: true,
-              //   refetchStrategies: [withRefetchOnTrigger(refresh$)],
-              // });
+
               const source$ = rxRequest({
                 requestFn: () => s$,
                 config: {
@@ -436,9 +403,7 @@ describe(rxRequest.name, () => {
           test('should execute beforeHandleErrorFn', () => {
             const source$ = new Subject<any>();
             const beforeHandleErrorFn = jest.fn();
-            // const result = subscribeSpyTo(
-            //   rxStatefulRequest<any>(source$.pipe(mergeAll()), { ...defaultConfig, beforeHandleErrorFn }).value$()
-            // );
+
             const result = subscribeSpyTo(
               rxRequest({
                 requestFn: () => source$.pipe(mergeAll()),
@@ -460,11 +425,7 @@ describe(rxRequest.name, () => {
               const s$ = cold('-#', {}, error);
               const refresh$ = cold('---a-', { a: void 0 });
               const expected = 'sa-sa-';
-              // const source$ = rxStatefulRequest<any,any>(s$, {
-              //   ...defaultConfig,
-              //   errorMappingFn: (error: Error) => error.message,
-              //   refetchStrategies: [withRefetchOnTrigger(refresh$)],
-              // });
+
               const source$ = rxRequest<any, any, any>({
                 requestFn: () => s$,
                 config: {
@@ -507,11 +468,7 @@ describe(rxRequest.name, () => {
               const s$ = cold('-#', {}, error);
               const trigger$ = cold('a---a-', { a: 1 });
               const expected = 'sa--sa-';
-              // const source$ = rxStatefulRequest<any, any>((n: number) => s$, {
-              //   ...defaultConfig,
-              // sourceTriggerConfig: {
-              //     trigger: trigger$
-              // }});
+
               const source$ = rxRequest({
                 trigger: trigger$,
                 requestFn: (n: number) => s$,
@@ -549,12 +506,7 @@ describe(rxRequest.name, () => {
               const s$ = cold('-#', {}, error);
               const trigger$ = cold('a---a-', { a: 1 });
               const expected = 'za--ya-';
-              // const source$ = rxStatefulRequest<any, any>((n: number) => s$, {
-              //   ...defaultConfig,
-              //   keepErrorOnRefresh: true,
-              //   sourceTriggerConfig: {
-              //     trigger: trigger$
-              //   }});
+
               const source$ = rxRequest({
                 trigger: trigger$,
                 requestFn: (n: number) => s$,
@@ -598,11 +550,6 @@ describe(rxRequest.name, () => {
           test('should execute beforeHandleErrorFn', () => {
             const trigger$ = new Subject<any>()
             const beforeHandleErrorFn = jest.fn();
-            // const result = subscribeSpyTo(
-            //   rxStatefulRequest<any, any>(() => throwError(() => new Error('error')), { ...defaultConfig, beforeHandleErrorFn, sourceTriggerConfig: {
-            //     trigger: trigger$
-            //     } }).value$()
-            // );
 
             const source$ = subscribeSpyTo(rxRequest({
               trigger: trigger$,
@@ -625,13 +572,7 @@ describe(rxRequest.name, () => {
               const s$ = cold('-#', {}, error);
               const trigger$ = cold('a---a-', { a: 1 });
               const expected = 'sa--sa-';
-              // @ts-ignore
-              // const source$ = rxStatefulRequest<any, any>((n: number) => s$, {
-              //   ...defaultConfig,
-              //   errorMappingFn: (error: Error) => error.message,
-              //   sourceTriggerConfig: {
-              //     trigger: trigger$
-              //   }});
+
               const source$ = rxRequest({
                 trigger: trigger$,
                 requestFn: (n: number) => s$,
@@ -687,7 +628,7 @@ describe(rxRequest.name, () => {
           const s$ = cold('-a|', { a: 1 });
           const refresh$ = cold('----a-', { a: void 0 });
           const expected = '-a---';
-          // const source$ = rxStatefulRequest(s$, { ...defaultConfig, refetchStrategies: [withRefetchOnTrigger(refresh$)] });
+
           const source$ = rxRequest({
             requestFn: () => s$,
             config: {
@@ -718,7 +659,7 @@ describe(rxRequest.name, () => {
         runWithTestScheduler(({ expectObservable, cold }) => {
           const s$ = cold('---a|', { a: 1 });
           const expected = '--s-a';
-          // const source$ = rxStatefulRequest(s$, { ...defaultConfig });
+
           const source$ = rxRequest({
             requestFn: () => s$,
             config: {
@@ -757,7 +698,7 @@ describe(rxRequest.name, () => {
         runWithTestScheduler(({ expectObservable, cold }) => {
           const s$ = cold('------a|', { a: 1 });
           const expected = '--s---a';
-          // const source$ = rxStatefulRequest(s$, { ...defaultConfig });
+
           const source$ = rxRequest({
             requestFn: () => s$,
             config: {
@@ -799,7 +740,7 @@ describe(rxRequest.name, () => {
           const s$ = (n: number) => cold('-a|', { a: n });
           const trigger$ = cold('a--b-', { a: 1, b: 2 });
           const expected = '-a--b';
-          // const source$ = rxStatefulRequest((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
+
           const source$ = rxRequest({
             trigger: trigger$,
             requestFn: (n) => s$(n),
@@ -842,7 +783,7 @@ describe(rxRequest.name, () => {
           const s$ = (n: number) => cold('---a|', { a: n });
           const trigger$ = cold('a----b------', { a: 1, b: 2 });
           const expected = '--s-a--s-b';
-          // const source$ = rxStatefulRequest((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
+
           const source$ = rxRequest({
             trigger: trigger$,
             requestFn: (n) => s$(n),
@@ -891,7 +832,6 @@ describe(rxRequest.name, () => {
           const s$ = (n: number) => cold('------a|', { a: n });
           const trigger$ = cold('a--------b-------', { a: 1, b: 2 });
           const expected = '--s---a----s---b-----';
-          // const source$ = rxStatefulRequest((n) => s$(n), { ...defaultConfig, sourceTriggerConfig: { trigger: trigger$ } });
           const source$ = rxRequest({
             trigger: trigger$,
             requestFn: (n) => s$(n),
