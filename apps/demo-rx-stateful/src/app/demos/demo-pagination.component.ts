@@ -7,7 +7,7 @@ import {BehaviorSubject, delay, Observable, scan, Subject, switchMap} from "rxjs
 import {MatPaginator, MatPaginatorModule} from "@angular/material/paginator";
 import {MatTableDataSource, MatTableModule} from "@angular/material/table";
 import {Todo} from "../types";
-import {rxStateful$, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
+import {rxRequest, rxStateful$, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
 import { DataSource } from '@angular/cdk/collections';
 import {MatButtonModule} from "@angular/material/button";
 import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
@@ -32,7 +32,7 @@ import {MatCardModule} from "@angular/material/card";
     <div class="w-full flex gap-8">
       <button mat-button color="primary" (click)="page$$.next(-1)"> previous page </button>
       <button mat-button color="primary" (click)="page$$.next(1)"> next page </button>
-      <button mat-button color="primary" (click)="refresh$$.next(null)"> Refresh current page </button>
+      <button mat-button color="primary" (click)="request.refresh()"> Refresh current page </button>
       <button mat-button color="primary" *ngIf="page$ | async as page">    Current Page: {{page}} </button>
 
     </div>
@@ -45,7 +45,7 @@ import {MatCardModule} from "@angular/material/card";
     <div>
     <mat-card class="px-8 py-4 h-[350px]">
       <h2>Todos</h2>
-      <div *ngIf="state$ | async as state">
+      <div *ngIf="request.value$() | async as state">
         <ng-container *ngIf="state.value">
           <div class="list-container">
             <mat-list role="list" >
@@ -77,43 +77,35 @@ import {MatCardModule} from "@angular/material/card";
 export class DemoPaginationComponent   {
   code = `
   private readonly http = inject(HttpClient)
-  readonly refresh$$ = new Subject<null>()
+
   readonly page$$ = new BehaviorSubject(0)
   readonly page$ = this.page$$.pipe(
     scan((acc, curr) => acc + curr, 0)
   )
 
-  state$ = rxStateful$(
-    (page) => this.http.get<Todo[]>(\`https://jsonplaceholder.typicode.com/todos?_start=page&_limit=5\`).pipe(
+  request = rxRequest({
+    trigger: this.page$,
+    requestFn: (page) => this.http.get<Todo[]>(\`https://jsonplaceholder.typicode.com/todos?_start=page&_limit=5\`).pipe(
       // artificial delay
       delay(500)
     ),
-    {
-      sourceTriggerConfig: {
-        trigger: this.page$
-      },
-      refetchStrategies: withRefetchOnTrigger(this.refresh$$)
-    }
-  )
+  })
+
+
+
   `
   private readonly http = inject(HttpClient)
-  readonly refresh$$ = new Subject<null>()
   readonly page$$ = new BehaviorSubject(0)
   readonly page$ = this.page$$.pipe(
     scan((acc, curr) => acc + curr, 0)
   )
 
-  state$ = rxStateful$(
-    (page) => this.http.get<Todo[]>(`https://jsonplaceholder.typicode.com/todos?_start=${page * 5}&_limit=5`).pipe(
+  request = rxRequest({
+    trigger: this.page$,
+    requestFn:  (page) => this.http.get<Todo[]>(`https://jsonplaceholder.typicode.com/todos?_start=${page * 5}&_limit=5`).pipe(
       // artificial delay
       delay(500)
     ),
-    {
-      sourceTriggerConfig: {
-        trigger: this.page$
-      },
-      refetchStrategies: withRefetchOnTrigger(this.refresh$$)
-    }
-  )
+  })
 
 }
