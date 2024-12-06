@@ -17,9 +17,9 @@ export const appConfig: ApplicationConfig = {
         fullLibraryLoader: () => import('highlight.js')
       }
     },
-    provideRxStatefulConfig({
-      suspenseTimeMs: 5000,
-      suspenseThresholdMs: 8000,
-    })
+    // provideRxStatefulConfig({
+    //   suspenseTimeMs: 5000,
+    //   suspenseThresholdMs: 8000,
+    // })
   ],
 };
