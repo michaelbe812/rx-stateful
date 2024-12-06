@@ -14,12 +14,12 @@ import {AsyncPipe, JsonPipe} from "@angular/common";
     <p>Select one of the demos from the tabs below</p>
     <navigation />
 
-    <button (click)="refresh$$.next()">Refresh</button>
-    <button (click)="page$$.next(1)">next page</button>
-    {{ req.value$() | async | json }}
-    <br>
-    <hr>
-    {{ req2.value$() | async | json }}
+<!--    <button (click)="refresh$$.next()">Refresh</button>-->
+<!--    <button (click)="page$$.next(1)">next page</button>-->
+<!--    {{ req.value$() | async | json }}-->
+<!--    <br>-->
+<!--    <hr>-->
+<!--    {{ req2.value$() | async | json }}-->
   `,
   styles: [
     `
