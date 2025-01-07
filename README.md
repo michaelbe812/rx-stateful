@@ -1,6 +1,6 @@
 # @angular-kit/rx-stateful
 
-`rxStateful$` is a powerful RxJs operator that wraps async Observable and provides a
+`rx-stateful` is a powerful RxJs operator that wraps async Observable and provides a
 stateful stream. It does offer out of the box
 
 - 🔄 loading state
@@ -25,6 +25,7 @@ A live demo is available on [here](https://salmon-river-0283bb503.4.azurestatica
 ### `rxRequest` standalone function
 > [!TIP]
 > rxRequest is basically the same as rxStateful$ but with a more ergonomic API. It is recommended to use `rxRequest` instead of `rxStateful$`.
+> From version 2.0.0 onwards it is recommended to use `rxRequest` instead of `rxStateful$`. There is a migration available to migrate existing code `ng g @angular-kit/rx-stateful:migrate-to-rx-request` or within nx workspace `nx g @angular-kit/rx-stateful:migrate-to-rx-request`
 
 #### Basic Usage
 ```typescript
@@ -213,7 +214,6 @@ Please have a look at the [testing documentation](./testing/README.md).
 
 ## Versioning
 This project follows [Semantic Versioning](https://semver.org/).
-
 
 ## Angular Compatibility
 - Version `2.x.x` requires Angular >=18.0.0
