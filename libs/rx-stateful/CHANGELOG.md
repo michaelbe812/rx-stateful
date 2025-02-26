@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.0.0](https://github.com/michaelbe812/angular-kit-rx-stateful/compare/rx-stateful-2.0.0-rc.0...rx-stateful-2.0.0) (2025-02-26)
+
+
+### Bug Fixes
+
+* migrations.json now copied to build artifact ([bd59773](https://github.com/michaelbe812/angular-kit-rx-stateful/commit/bd5977324b741fb920864fe5c231933b20726fe8))
+
+
+
 # [2.0.0-rc.1](https://github.com/michaelbe812/angular-kit-rx-stateful/compare/rx-stateful-2.0.0-rc.0...rx-stateful-2.0.0-rc.1) (2025-02-26)
 
 
