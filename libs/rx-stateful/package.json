@@ -30,7 +30,7 @@
     "url": "https://github.com/mikelgo/angular-kit/tree/main/libs/rx-stateful"
   },
   "ng-update": {
-    "migrations": "./schematics/migration.json"
+    "migrations": "./schematics/migrations.json"
   },
   "schematics": "./schematics/collection.json"
 }

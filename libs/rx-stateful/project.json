@@ -31,7 +31,7 @@
         "commands": [
           "tsc -p libs/rx-stateful/tsconfig.schematics.json",
           "npx cpx libs/rx-stateful/schematics/collection.json dist/libs/rx-stateful/schematics",
-          "npx cpx libs/rx-stateful/schematics/migration.json dist/libs/rx-stateful/schematics",
+          "npx cpx libs/rx-stateful/schematics/migrations.json dist/libs/rx-stateful/schematics",
           "npx cpx libs/rx-stateful/schematics/src/**/files/** dist/libs/rx-stateful/schematics/src",
           "npx cpx libs/rx-stateful/schematics/src/**/schema.json dist/libs/rx-stateful/schematics/src"
         ],
