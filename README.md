@@ -63,6 +63,11 @@ const value$ = req.value$();
 
 `rxRequest.refresh()` offers a convenient way to trigger a refresh of the source. It will trigger the source again and emit the new states.
 
+
+> [!IMPORTANT]
+> Unlike default RxJs errors will not be present on the error-callback. As the errors are a part of the value emitted, error notifications
+> will be transfered via the next()-vallback.
+
 ### `rxStateful$` standalone function
 
 #### Basic Usage
