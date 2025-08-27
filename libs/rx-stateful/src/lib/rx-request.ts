@@ -1,5 +1,5 @@
 import { Observable, Subject } from 'rxjs';
-import { RxRequest, RxStatefulConfig } from './types/types';
+import { RxRequest, RxStatefulConfig, RxStatefulSourceTriggerConfig } from './types/types';
 import { createRxStateful } from './util/create-rx-stateful';
 import { withRefetchOnTrigger } from './refetch-strategies/refetch-on-trigger.strategy';
 import { createState$ } from './create-state';
@@ -62,7 +62,7 @@ export function rxRequest<T, A, E = unknown>(loaderOptions: RxStatefulLoader<T, 
     /**
      * Merge default config with user provided config
      */
-    const mergedConfig: RxStatefulConfig<T, E> = {
+    const mergedConfig: RxStatefulConfig<T, E> | RxStatefulSourceTriggerConfig<T, A, E> = {
       keepValueOnRefresh: false,
       keepErrorOnRefresh: false,
       suspenseThresholdMs: 0,
@@ -83,8 +83,7 @@ export function rxRequest<T, A, E = unknown>(loaderOptions: RxStatefulLoader<T, 
      * requestFn & trigger -> sourceFn$ with trigger
      */
     if (trigger) {
-      // @ts-ignore
-      mergedConfig.sourceTriggerConfig = {
+      (mergedConfig as RxStatefulSourceTriggerConfig<T, A, E>).sourceTriggerConfig = {
         trigger,
         operator: config?.operator ?? 'switch',
       };
