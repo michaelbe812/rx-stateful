@@ -15,8 +15,21 @@ import { assertInInjectionContext, inject, Injector, runInInjectionContext } fro
 import { RX_STATEFUL_CONFIG } from './config/rx-stateful-config';
 
 export type RxStatefulLoader<T,A,E> = {
+  /**
+   * Optional trigger to trigger the requestFn with an argument.
+   *
+   * If no trigger is provided, the requestFn is called without an argument.
+   */
   trigger?: Observable<A> | Subject<A>;
+  /**
+   * Function to create the request observable.
+   * If a trigger is provided, the function is called with the trigger value.
+   * If no trigger is provided, the function is called without a value.
+   */
   requestFn: (arg: A) => Observable<T>;
+  /**
+   * Configuration for the stateful request
+   */
   config?: RxStatefulConfig<T, E> & {
     /**
      *
