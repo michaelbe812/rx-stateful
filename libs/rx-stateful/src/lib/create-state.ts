@@ -23,6 +23,7 @@ import {
   withLatestFrom,
 } from 'rxjs';
 import { InternalRxState, RxStatefulConfig, RxStatefulSourceTriggerConfig, RxStatefulWithError } from './types/types';
+import { shareWithReplay } from './util/share-operators';
 import { _handleSyncValue } from './util/handle-sync-value';
 import { defaultAccumulationFn } from './types/accumulation-fn';
 import { mergeRefetchStrategies } from './refetch-strategies/merge-refetch-strategies';
@@ -66,12 +67,7 @@ export function createState$<T, A, E>(
             deriveInitialValue<T, E>(mergedConfig)
           )
       ),
-      share({
-        connector: () => new ReplaySubject(1),
-        resetOnError: true,
-        resetOnComplete: true,
-        resetOnRefCountZero: true,
-      }),
+      shareWithReplay(),
       catchError((error: E) => handleError<T, E>(error, mergedConfig, error$$))
     );
 
@@ -97,12 +93,7 @@ export function createState$<T, A, E>(
           catchError((error: E) => handleError<T, E>(error, mergedConfig, error$$))
         )
       ),
-      share({
-        connector: () => new ReplaySubject(1),
-        resetOnError: true,
-        resetOnComplete: true,
-        resetOnRefCountZero: true,
-      })
+      shareWithReplay()
     );
 
     const hasResponse1$ = refreshedValue$.pipe(
@@ -203,12 +194,7 @@ export function createState$<T, A, E>(
         context: 'suspense',
       }),
       distinctUntilChanged(),
-      share({
-        connector: () => new ReplaySubject(1),
-        resetOnError: true,
-        resetOnComplete: true,
-        resetOnRefCountZero: true,
-      }),
+      shareWithReplay(),
       _handleSyncValue()
     );
 
@@ -218,12 +204,7 @@ export function createState$<T, A, E>(
   // case 2: no SourceTriggerConfig given --> sourceOrSourceFn$ is Observable
   if (isObservable(sourceOrSourceFn$)) {
     const sharedSource$ = sourceOrSourceFn$.pipe(
-      share({
-        connector: () => new ReplaySubject(1),
-        resetOnError: true,
-        resetOnComplete: true,
-        resetOnRefCountZero: true,
-      }),
+      shareWithReplay(),
       catchError((error: E) => handleError<T, E>(error, mergedConfig, error$$))
     );
 
@@ -237,12 +218,7 @@ export function createState$<T, A, E>(
           deriveInitialValue<T, E>(mergedConfig)
         )
       ),
-      share({
-        connector: () => new ReplaySubject(1),
-        resetOnError: true,
-        resetOnComplete: true,
-        resetOnRefCountZero: true,
-      })
+      shareWithReplay()
     ) as Observable<Partial<InternalRxState<T, E>>>;
 
     const hasResponse$ = refreshedRequest$.pipe(
@@ -296,12 +272,7 @@ export function createState$<T, A, E>(
         context: 'suspense',
       }),
       distinctUntilChanged(),
-      share({
-        connector: () => new ReplaySubject(1),
-        resetOnError: true,
-        resetOnComplete: true,
-        resetOnRefCountZero: true,
-      }),
+      shareWithReplay(),
       _handleSyncValue()
     );
   }
