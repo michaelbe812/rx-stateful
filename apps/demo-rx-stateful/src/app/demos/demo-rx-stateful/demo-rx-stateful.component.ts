@@ -5,7 +5,7 @@ import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, concatAll, delay, map, scan, Subject, switchMap, tap, toArray} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 import {provideRxStatefulClient, RxStatefulClient, withConfig} from "@angular-kit/rx-stateful/experimental";
-import {rxStateful$, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
+import {rxRequest, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
 import {MatButtonModule} from "@angular/material/button";
 
 @Component({
@@ -40,7 +40,7 @@ import {MatButtonModule} from "@angular/material/button";
 <!--    <div>-->
 <!--      <button mat-button color="primary" (click)="page$$.next(-1)"> previous page </button>-->
 <!--      <button mat-button color="primary" (click)="page$$.next(1)"> next page </button>-->
-<!--      <button mat-button color="primary" (click)="refresh$$.next(null)"> Refresh current page </button>-->
+<!--      <button mat-button color="primary" (click)="request2.refresh()"> Refresh current page </button>-->
 <!--      <div>-->
 <!--        <h4>State Accumulated</h4>-->
 <!--        <ul *ngFor="let v of state2Accumulated$ | async">-->
@@ -61,6 +61,7 @@ export class DemoRxStatefulComponent {
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
   refresh$$ = new Subject<any>();
+  refreshPage$$ = new Subject<any>();
 
   client = inject(RxStatefulClient);
 
@@ -88,13 +89,18 @@ export class DemoRxStatefulComponent {
   // );
 
 
-  state$ = rxStateful$(this.fetch(400), {
-    keepValueOnRefresh: false,
-    keepErrorOnRefresh: false,
-    refreshTrigger$: this.refresh$$,
-    suspenseTimeMs: 1000,
-    suspenseThresholdMs: 500
+  request = rxRequest({
+    requestFn: () => this.fetch(400),
+    config: {
+      keepValueOnRefresh: false,
+      keepErrorOnRefresh: false,
+      refetchStrategies: withRefetchOnTrigger(this.refresh$$),
+      suspenseTimeMs: 1000,
+      suspenseThresholdMs: 500
+    }
   });
+  
+  state$ = this.request.value$();
 
   stateAccumulated$ = this.state$.pipe(
     tap(x => console.log({state: x})),
@@ -110,20 +116,18 @@ export class DemoRxStatefulComponent {
     scan((acc, curr) => acc + curr, 0)
   )
 
-  state2$ = rxStateful$(
-    (page) => this.fetchPage({
+  request2 = rxRequest({
+    trigger: this.page$,
+    requestFn: (page) => this.fetchPage({
       page,
       delayInMs: 1000
-    }).pipe(
-
-    ),
-    {
-      sourceTriggerConfig: {
-        trigger: this.page$
-      },
-      refetchStrategies: withRefetchOnTrigger(this.refresh$$)
+    }),
+    config: {
+      refetchStrategies: withRefetchOnTrigger(this.refreshPage$$)
     }
-  )
+  });
+  
+  state2$ = this.request2.value$()
   state2Accumulated$ = this.state2$.pipe(
     tap(x => console.log({state: x})),
     scan((acc, value, index) => {
