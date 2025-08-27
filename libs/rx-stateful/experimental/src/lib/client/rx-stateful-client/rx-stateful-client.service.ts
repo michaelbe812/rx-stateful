@@ -3,7 +3,7 @@ import {map, Observable} from 'rxjs';
 import {
   RxStateful,
   RxStatefulConfig,
-  rxStateful$,
+  rxRequest,
   Config,
   RX_STATEFUL_CONFIG
 } from '@angular-kit/rx-stateful';
@@ -53,11 +53,16 @@ export class RxStatefulClient {
 
     const k = typeof optionsOrKey === 'string' ? optionsOrKey : key;
 
+    const request = rxRequest<T, undefined, E>({
+      requestFn: () => source$,
+      config: mergedConfig
+    });
+
     if (k){
-      return rxStateful$<T, E>(source$, mergedConfig).pipe(
+      return request.value$().pipe(
         map(state => state[k])
       );
     }
-    return rxStateful$<T, E>(source$, mergedConfig);
+    return request.value$();
   }
 }
