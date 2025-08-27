@@ -27,6 +27,9 @@ A live demo is available on [here](https://salmon-river-0283bb503.4.azurestatica
 > rxRequest is basically the same as rxStateful$ but with a more ergonomic API. It is recommended to use `rxRequest` instead of `rxStateful$`.
 > From version 2.0.0 onwards it is recommended to use `rxRequest` instead of `rxStateful$`. There is a migration available to migrate existing code `ng g @angular-kit/rx-stateful:migrate-to-rx-request` or within nx workspace `nx g @angular-kit/rx-stateful:migrate-to-rx-request`
 
+> [!WARNING]
+> From version 3.0.0 onwards `rxStateful$` is removed.
+
 #### Basic Usage
 ```typescript
 import { rxRequest } from '@angular-kit/rx-stateful';
@@ -68,53 +71,11 @@ const value$ = req.value$();
 > Unlike default RxJs errors will not be present on the error-callback. As the errors are a part of the value emitted, error notifications
 > will be transfered via the next()-vallback.
 
-### `rxStateful$` standalone function
-
-#### Basic Usage
-```typescript
-import { rxStateful$ } from '@angular-kit/rx-stateful';
-
-/**
- * Async Observable will return: 
- * [
- * { value: null, hasValue: false, context: 'suspense', hasError: false, error: undefined },
- * { value: SOME_VALUE, hasValue: true, context: 'next', hasError: false, error: undefined },
- * ]
- */
-
-const stateful$ = rxStateful$(from(fetch('...')));
-```
-
-#### 
-
-```ts
-
-const trigger$$ = new Subject<number>()
-const refresh$$ = new Subject<void>()
-const stateful$ = rxStateful$((id: number) => from(fetch(`.../${id}`)), {
-    sourceTriggerConfig: {
-        trigger: trigger$$
-    },
-    refetchStrategy: withRefetchOnTrigger(refresh$$)
-});
-```
-
-
-### API
-`rxStateful$` returns a Observable of with following properties:
-- `value` - the value
-- `hasValue` - boolean if a value is present
-- `context` - the context of the stream ('suspense', 'next', 'error', 'complete')
-- `hasError` - boolean if an error is present
-- `error` - the error, if present
-- `isSuspense` - suspense/loading state
-
-
-### Configuration of `rxStateful$` or `rxRequest`
-Both `rxRequest` and `rxStateful$` provides configuration possibility on instance level or globally.
+### Configuration of or `rxRequest`
+`rxRequest`  provides configuration possibility on instance level or globally.
 
 #### Global configuration
-You can provide a global configuration for `rxStateful$` and `rxRequest`. This configuration will be used for every instance of `rxStateful$` and `rxRequest`.
+You can provide a global configuration for `rxRequest`. This configuration will be used for every instance of `rxRequest`.
 
 Use `provideRxStatefulConfig` in either your `AppModule` or `appConfig` to provide a global configuration.
 
@@ -136,7 +97,7 @@ You can also provide a configuration on instance level. This will also override 
 > wait a certain amount of time before showing a spinner (suspenseThreshold). If then the request takes longer thant the threshold-time a spinner will be shown for at least another amount of time
 > (suspenseTime). That way you can prevent flickering spinners.
 > 
-> `rxStateful$` provides exactly this feature and will only emit the suspense-state if a async-operation takes longer than the specified `suspenseThresholdMs` for at least `suspenseTimeMs`.
+> `rxRequest` provides exactly this feature and will only emit the suspense-state if a async-operation takes longer than the specified `suspenseThresholdMs` for at least `suspenseTimeMs`.
 > A reasonable configuration of these two values would be to set them both to 500ms.
 
 > [!IMPORTANT]
@@ -146,14 +107,12 @@ You can also provide a configuration on instance level. This will also override 
 
 ##### Configuration Example
 ```typescript
-import { rxStateful$, rxRequest } from '@angular-kit/rx-stateful';
+import { rxRequest } from '@angular-kit/rx-stateful';
 
-const rxStateful$ = rxStateful$(someSource$, { keepValueOnRefresh: true });
+
 const rxRequest = rxRequest({ requestFn: () => someSource$, config: { keepValueOnRefresh: true } });
 ```
-##### `refetchStrategies`
-- `withRefetchOnTrigger`
-- `withAutoRefetch`
+
 
 ### Usage via `RxStatefulClient`
 > [!CAUTION]
@@ -190,15 +149,20 @@ The global configuration will be used for every `request`-call. You can still ov
 providing a configuration object as second parameter to `request`-method.
 
 ## Configuring refresh behaviour
-Both `rxStateful$` and `RxStatefulClient` can be configured to refresh the source (e.g. make a HTTP call again).  
+Both `rxRequest` and `RxStatefulClient` can be configured to refresh the source (e.g. make a HTTP call again).  
 
 To define the refresh behaviour you can make use of so called `RefetchStrategy`'s. Right now there are following strategies
 built in: `withAutoRefetch` and `withRefetchOnTrigger`.
 
-### Usage on `rxStateful$`
+### Usage on `rxRequest`
 ```typescript
 ```typescript
-    const instance = rxStateful$(fetch(), { refetchStrategy: [withAutoRefetch(1000, Infinity)] })
+    const instance = rxRequest({
+        requestFn: () => someSource$,
+        config: {
+            refetchStrategies: [withAutoRefetch(1000, Infinity)]
+        }
+    })
 ```
 ### Usage on `RxStatefulClient`
 
@@ -209,7 +173,7 @@ const client = inject(RxStatefulClient);
 const instance = client.request(fetch(), { refetchStrategy: [withAutoRefetch(1000, Infinity)] })
 ```
 
-All strategies can be cominded in an arbitrary way.
+All strategies can be comined in an arbitrary way.
 
 In the future there will come more strategies built in, as well as an easy way to define custom strategies. However defining
 custom strategies is already possible by implementing the `RefetchStrategy` interface.
