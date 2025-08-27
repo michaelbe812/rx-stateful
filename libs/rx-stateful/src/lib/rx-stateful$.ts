@@ -1,4 +1,3 @@
-import { inject, Injector, runInInjectionContext, assertInInjectionContext } from '@angular/core';
 import {
   BehaviorSubject,
   catchError,
@@ -23,98 +22,12 @@ import {
   timer,
   withLatestFrom,
 } from 'rxjs';
-import {
-  InternalRxState,
-  RxStateful,
-  RxStatefulConfig,
-  RxStatefulSourceTriggerConfig,
-  RxStatefulWithError,
-} from './types/types';
+import { InternalRxState, RxStatefulConfig, RxStatefulSourceTriggerConfig, RxStatefulWithError } from './types/types';
 import { _handleSyncValue } from './util/handle-sync-value';
 import { defaultAccumulationFn } from './types/accumulation-fn';
-import { createRxStateful } from './util/create-rx-stateful';
 import { mergeRefetchStrategies } from './refetch-strategies/merge-refetch-strategies';
 import { isFunctionGuard, isSourceTriggerConfigGuard } from './types/guards';
 import { applyFlatteningOperator } from './util/apply-flattening-operator';
-import { RX_STATEFUL_CONFIG } from './config/rx-stateful-config';
-
-/**
- * @publicApi
- *
- * @description
- * Creates a new rxStateful$ instance.
- *
- * rxStateful$ will enhance the source$ with additional information about the current state of the source$, like
- * e.g. if it is in a suspense or error state.
- *
- * @example
- * const source$ = httpClient.get('https://my-api.com');
- * const rxStateful$ = rxStateful$(source$);
- *
- * @param source$ - The source$ to enhance with additional state information.
- *
- * @deprecated use rxStatefulRequest instead
- */
-export function rxStateful$<T, E = unknown>(source$: Observable<T>): Observable<RxStateful<T, E>>;
-/**
- * @publicApi
- *
- * @example
- * const source$ = httpClient.get('https://my-api.com');
- * const rxStateful$ = rxStateful$(source$, { keepValueOnRefresh: true });
- *
- * @param source$ - The source$ to enhance with additional state information.
- * @param config - Configuration for rxStateful$.
- *
- * @deprecated use rxStatefulRequest instead
- */
-export function rxStateful$<T, E = unknown>(
-  source$: Observable<T>,
-  config: RxStatefulConfig<T, E>
-): Observable<RxStateful<T, E>>;
-/**
- * @publicApi
- *
- * @example
- * const sourceTrigger$$ = new Subject<string>()
- * const rxStateful$ = rxStateful$((arg: string) => httpClient.get(`https://my-api.com/${arg}`), { keepValueOnRefresh: true, sourceTriggerConfig: {trigger: sourceTrigger$$}})
- * @param sourceFn$
- * @param sourceTriggerConfig
- *
- * @deprecated use rxStatefulRequest instead
- */
-export function rxStateful$<T, A, E = unknown>(
-  sourceFn$: (arg: A) => Observable<T>,
-  sourceTriggerConfig: RxStatefulSourceTriggerConfig<T, A, E>
-): Observable<RxStateful<T, E>>;
-
-export function rxStateful$<T, A, E = unknown>(
-  sourceOrSourceFn$: Observable<T> | ((arg: A) => Observable<T>),
-  config?: RxStatefulConfig<T, E> | RxStatefulSourceTriggerConfig<T, A, E>
-): Observable<RxStateful<T, E>> {
-  !config?.injector && assertInInjectionContext(rxStateful$);
-  const assertedInjector = config?.injector ?? inject(Injector);
-
-  return runInInjectionContext(assertedInjector, () => {
-    const globalConfig = inject(RX_STATEFUL_CONFIG, { optional: true });
-    /**
-     * Merge default config with user provided config
-     */
-    const mergedConfig: RxStatefulConfig<T, E> = {
-      keepValueOnRefresh: false,
-      keepErrorOnRefresh: false,
-      suspenseThresholdMs: 0,
-      suspenseTimeMs: 0,
-      ...globalConfig,
-      ...config,
-    };
-
-    const state$ = createState$<T, A, E>(sourceOrSourceFn$, mergedConfig);
-    const rxStateful = createRxStateful<T, E>(state$, mergedConfig);
-
-    return rxStateful;
-  });
-}
 
 /**
  * @internal
@@ -252,7 +165,7 @@ export function createState$<T, A, E>(
     const pair1$ = s2.pipe(
       withLatestFrom(valueFromSourceTrigger$),
       filter(
-         // @ts-ignore
+        // @ts-ignore
         ([loading, valueFromSourceTrigger]) => (!loading && valueFromSourceTrigger.context !== 'suspense') || loading
       ),
       map(([loading, value]) => value)
@@ -261,7 +174,7 @@ export function createState$<T, A, E>(
     const pair2$ = s1.pipe(
       withLatestFrom(refreshedValue$),
       filter(
-            // @ts-ignore
+        // @ts-ignore
         ([loading, valueFromSourceTrigger]) => (!loading && valueFromSourceTrigger.context !== 'suspense') || loading
       ),
       map(([loading, value]) => value)
