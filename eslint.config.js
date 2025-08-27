@@ -5,6 +5,7 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
   recommendedConfig: js.configs.recommended,
 });
+
 module.exports = [
   { plugins: { '@nx': nxEslintPlugin } },
   {
@@ -35,9 +36,21 @@ module.exports = [
     files: ['**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs'],
     rules: {},
   })),
-  ...compat.config({ env: { jest: true } }).map((config) => ({
-    ...config,
+  // Native flat config for Jest environment instead of using FlatCompat
+  {
     files: ['**/*.spec.ts', '**/*.spec.tsx', '**/*.spec.js', '**/*.spec.jsx'],
-    rules: {},
-  })),
+    languageOptions: {
+      globals: {
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        jest: 'readonly',
+        test: 'readonly',
+      },
+    },
+  },
 ];

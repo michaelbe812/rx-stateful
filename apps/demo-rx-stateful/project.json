@@ -70,6 +70,13 @@
       "options": {
         "buildTarget": "demo-rx-stateful:build"
       }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/demo-rx-stateful/**/*.ts", "apps/demo-rx-stateful/**/*.html"]
+      }
     }
   }
 }

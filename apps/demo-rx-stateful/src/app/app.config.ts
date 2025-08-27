@@ -4,7 +4,7 @@ import { appRoutes } from './app.routes';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from "@angular/common/http";
 import { HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
-import {provideRxStatefulConfig} from "../../../../libs/rx-stateful/src";
+import {provideRxStatefulConfig} from "@angular-kit/rx-stateful";
 
 export const appConfig: ApplicationConfig = {
   providers: [
