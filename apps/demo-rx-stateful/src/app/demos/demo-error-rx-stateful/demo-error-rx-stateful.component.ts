@@ -1,6 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {rxStateful$, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
+import {rxRequest, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
 import {map, MonoTypeOperatorFunction, Observable, of, ReplaySubject, scan, share, Subject, switchMap, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 
@@ -129,15 +129,19 @@ export class DemoErrorRxStatefulComponent {
     share()
   )*/
 
-  rxNormal$ = rxStateful$(this.http.get(`https://jsonplaceholder.typicode.com/posts/1`), {
-    refetchStrategies: [
+  rxNormalRequest = rxRequest({
+    requestFn: () => this.http.get(`https://jsonplaceholder.typicode.com/posts/1`),
+    config: {
+      refetchStrategies: [
         withRefetchOnTrigger(this.refreshRx$),
         withRefetchOnTrigger(this.idRx$$),
         //withAutoRefetch(1000, 5000)
-    ],
+      ],
       keepValueOnRefresh: true
-
-  }).pipe(
+    }
+  });
+  
+  rxNormal$ = this.rxNormalRequest.value$().pipe(
       scan((acc, value, index) => {
         // @ts-ignore
         acc.push({ index, value });
@@ -159,13 +163,15 @@ export class DemoErrorRxStatefulComponent {
 
   //newPlainRx$ = of(null)
 
-  newPlainRx$ = rxStateful$(
-      (id) => this.http.get(`https://jsonplaceholder.typicode.com/posts/${id}`),
-      {
-          sourceTriggerConfig: {trigger: this.idRx$},
-          refetchStrategies: withRefetchOnTrigger(this.refreshRx$),
-      },
-  ).pipe(
+  newPlainRequest = rxRequest({
+    trigger: this.idRx$,
+    requestFn: (id) => this.http.get(`https://jsonplaceholder.typicode.com/posts/${id}`),
+    config: {
+      refetchStrategies: withRefetchOnTrigger(this.refreshRx$)
+    }
+  });
+  
+  newPlainRx$ = this.newPlainRequest.value$().pipe(
       // log('newPlainRx$'),
       scan((acc, value, index) => {
         // @ts-ignore
