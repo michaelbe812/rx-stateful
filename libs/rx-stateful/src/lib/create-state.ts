@@ -24,6 +24,7 @@ import {
 } from 'rxjs';
 import { InternalRxState, RxStatefulConfig, RxStatefulSourceTriggerConfig, RxStatefulWithError } from './types/types';
 import { shareWithReplay } from './util/share-operators';
+import { createLoadingIndicator, pairLoadingWithResponse } from './util/loading-indicator';
 import { _handleSyncValue } from './util/handle-sync-value';
 import { defaultAccumulationFn } from './types/accumulation-fn';
 import { mergeRefetchStrategies } from './refetch-strategies/merge-refetch-strategies';
@@ -96,80 +97,13 @@ export function createState$<T, A, E>(
       shareWithReplay()
     );
 
-    const hasResponse1$ = refreshedValue$.pipe(
-      // @ts-ignore
-      map((v) => v.context === 'next' || v.context === 'error'),
-      filter((v) => !!v)
-    );
-    const hasResponse2$ = valueFromSourceTrigger$.pipe(
-      // @ts-ignore
-      map((v) => v.context === 'next' || v.context === 'error'),
-      filter((v) => !!v)
-    );
+    // Create loading indicators using the helper function
+    const s1 = createLoadingIndicator(refreshTrigger$, refreshedValue$, suspenseThreshold, suspenseTime);
+    const s2 = createLoadingIndicator(sourceTrigger$, valueFromSourceTrigger$, suspenseThreshold, suspenseTime);
 
-    // refreshedValue$
-    const s1 = refreshTrigger$.pipe(
-      switchMap(() =>
-        merge(
-          // ON after suspenseThreshold
-          timer(suspenseThreshold).pipe(
-            map(() => true),
-            // if response comes earlier than thresehold we do not want to emit loading
-            takeUntil(hasResponse1$)
-          ),
-          // OFF once we receive a result, yet at least after suspenseTime + suspenseThreshold
-          combineLatest([
-            refreshedValue$.pipe(
-              // with this we make sure that we do not turn off the suspsense state as long as a request is running
-              // @ts-ignore
-              filter((v) => v.context !== 'suspense')
-            ),
-            timer(suspenseThreshold + suspenseTime),
-          ]).pipe(map(() => false))
-        ).pipe(startWith(false))
-      )
-    );
-    // valueFromSourceTrigger$
-    const s2 = sourceTrigger$.pipe(
-      switchMap(() =>
-        merge(
-          // ON after suspenseThreshold
-          timer(suspenseThreshold).pipe(
-            map(() => true),
-            // if response comes earlier than thresehold we do not want to emit loading
-            takeUntil(hasResponse2$)
-          ),
-          // OFF once we receive a result, yet at least after suspenseTime + suspenseThreshold
-          combineLatest([
-            valueFromSourceTrigger$.pipe(
-              // with this we make sure that we do not turn off the suspsense state as long as a request is running
-              // @ts-ignore
-              filter((v) => v.context !== 'suspense')
-            ),
-            timer(suspenseThreshold + suspenseTime),
-          ]).pipe(map(() => false))
-        ).pipe(startWith(false))
-      )
-    );
-
-    // Correct Pairs
-    const pair1$ = s2.pipe(
-      withLatestFrom(valueFromSourceTrigger$),
-      filter(
-        // @ts-ignore
-        ([loading, valueFromSourceTrigger]) => (!loading && valueFromSourceTrigger.context !== 'suspense') || loading
-      ),
-      map(([loading, value]) => value)
-    );
-
-    const pair2$ = s1.pipe(
-      withLatestFrom(refreshedValue$),
-      filter(
-        // @ts-ignore
-        ([loading, valueFromSourceTrigger]) => (!loading && valueFromSourceTrigger.context !== 'suspense') || loading
-      ),
-      map(([loading, value]) => value)
-    );
+    // Correct Pairs using helper function
+    const pair1$ = pairLoadingWithResponse(s2, valueFromSourceTrigger$);
+    const pair2$ = pairLoadingWithResponse(s1, refreshedValue$);
 
     const finalResult$ = merge(
       // @ts-ignore
@@ -221,38 +155,11 @@ export function createState$<T, A, E>(
       shareWithReplay()
     ) as Observable<Partial<InternalRxState<T, E>>>;
 
-    const hasResponse$ = refreshedRequest$.pipe(
-      map((v) => v.context === 'next' || v.context === 'error'),
-      filter((v) => !!v)
-    );
-    const showLoadingIndicator$ = refresh$.pipe(
-      switchMap(() =>
-        merge(
-          // ON after suspenseThreshold
-          timer(suspenseThreshold).pipe(
-            map(() => true),
-            // if response comes earlier than thresehold we do not want to emit loading
-            takeUntil(hasResponse$)
-          ),
-          // OFF once we receive a result, yet at least after suspenseTime + suspenseThreshold
-          combineLatest([
-            refreshedRequest$.pipe(
-              // with this we make sure that we do not turn off the suspsense state as long as a request is running
-              filter((v) => v.context !== 'suspense')
-            ),
-            timer(suspenseThreshold + suspenseTime),
-          ]).pipe(map(() => false))
-        ).pipe(startWith(false))
-      )
-    );
+    // Create loading indicator using helper function
+    const showLoadingIndicator$ = createLoadingIndicator(refresh$, refreshedRequest$, suspenseThreshold, suspenseTime);
 
-    const pair$ = showLoadingIndicator$.pipe(
-      withLatestFrom(refreshedRequest$),
-      filter(
-        ([loading, valueFromSourceTrigger]) => (!loading && valueFromSourceTrigger.context !== 'suspense') || loading
-      ),
-      map(([loading, value]) => value)
-    );
+    // Pair loading with response using helper function
+    const pair$ = pairLoadingWithResponse(showLoadingIndicator$, refreshedRequest$);
     // We need to do this because if the response is coming immediatly/before the threshold is reached we would not get any value
     const result$ = race(pair$, refreshedRequest$.pipe(filter((v) => v.context !== 'suspense')));
 
