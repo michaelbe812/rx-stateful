@@ -1,6 +1,4 @@
-import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+import '@analogjs/vite-plugin-angular/setup-zone';
 import { TextEncoder, TextDecoder } from 'util';
-
-setupZoneTestEnv();
 
 Object.assign(global, { TextDecoder, TextEncoder });
