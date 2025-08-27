@@ -2,7 +2,7 @@ import { Component, inject, Injectable } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { delay, Observable, of, OperatorFunction, scan, Subject, switchMap, timer } from 'rxjs';
-import { rxRequest, RxStateful, rxStateful$, withAutoRefetch, withRefetchOnTrigger } from '@angular-kit/rx-stateful';
+import { rxRequest, RxStateful, withAutoRefetch, withRefetchOnTrigger } from '@angular-kit/rx-stateful';
 import { Todo } from '../types';
 import { RxStatefulStateVisualizerComponent } from './rx-stateful-state-visualizer.component';
 import { NonFlickerComponent } from './non-flicker/non-flicker.component';

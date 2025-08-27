@@ -3,7 +3,7 @@ import { RouterModule } from '@angular/router';
 import {MatButtonModule} from "@angular/material/button";
 import {async, delay, Subject} from "rxjs";
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import {rxRequest, rxStateful$, withAutoRefetch, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
+import {rxRequest, withAutoRefetch, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
 import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import { Todo } from '../types';

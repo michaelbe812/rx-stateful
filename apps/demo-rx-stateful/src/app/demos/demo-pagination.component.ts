@@ -7,7 +7,7 @@ import {BehaviorSubject, delay, Observable, scan, Subject, switchMap} from "rxjs
 import {MatPaginator, MatPaginatorModule} from "@angular/material/paginator";
 import {MatTableDataSource, MatTableModule} from "@angular/material/table";
 import {Todo} from "../types";
-import {rxRequest, rxStateful$, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
+import {rxRequest, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
 import { DataSource } from '@angular/cdk/collections';
 import {MatButtonModule} from "@angular/material/button";
 import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
