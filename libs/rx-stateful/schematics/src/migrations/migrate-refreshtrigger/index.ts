@@ -35,7 +35,7 @@ function addWithRefetchOnTriggerImport(sourceText: string): string {
 
   if (existingImportMatch) {
     // Append to existing import
-    const existingImports = existingImportMatch[1];
+    const existingImports = existingImportMatch[1].trim();
     const newImports = existingImports.includes('withRefetchOnTrigger')
       ? existingImports
       : `${existingImports}, withRefetchOnTrigger`;

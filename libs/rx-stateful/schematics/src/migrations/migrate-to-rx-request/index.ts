@@ -52,10 +52,14 @@ function ensureImport(sourceText: string): string {
   // Add new import at the start, after any existing imports
   const lastImportIndex = findLastImportIndex(sourceText);
   if (lastImportIndex !== -1) {
+    // Find the end of the line for the last import
+    const endOfLine = sourceText.indexOf('\n', lastImportIndex);
+    const insertIndex = endOfLine === -1 ? lastImportIndex : endOfLine;
+    
     return (
-      sourceText.slice(0, lastImportIndex) +
-      "\nimport { rxRequest } from '@angular-kit/rx-stateful';\n" +
-      sourceText.slice(lastImportIndex)
+      sourceText.slice(0, insertIndex) +
+      "\nimport { rxRequest } from '@angular-kit/rx-stateful';" +
+      sourceText.slice(insertIndex)
     );
   }
 
@@ -64,12 +68,12 @@ function ensureImport(sourceText: string): string {
 }
 
 function findLastImportIndex(sourceText: string): number {
-  const importRegex = /^import.*?;?\s*$/gm;
+  const importRegex = /^import.*?;?/gm;
   let lastIndex = -1;
   let match;
 
   while ((match = importRegex.exec(sourceText)) !== null) {
-    lastIndex = match.index + match[0].length;
+    lastIndex = match.index;
   }
 
   return lastIndex;
