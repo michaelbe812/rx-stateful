@@ -14,16 +14,18 @@
       "inputs": ["default", "^production"],
       "cache": true
     },
-    "@nx/jest:jest": {
-      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+    "@analogjs/vitest-angular:test": {
+      "inputs": ["default", "^production", "{workspaceRoot}/vite.config.ts"],
       "cache": true,
       "options": {
         "passWithNoTests": true
       },
       "configurations": {
         "ci": {
-          "ci": true,
-          "codeCoverage": true
+          "reporter": "verbose",
+          "coverage": {
+            "enabled": true
+          }
         }
       }
     },
@@ -43,7 +45,7 @@
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
       "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/vite.config.[jt]s",
       "!{projectRoot}/.eslintrc.json",
       "!{projectRoot}/cypress/**/*",
       "!{projectRoot}/**/*.cy.[jt]s?(x)",

@@ -40,10 +40,10 @@
       "outputs": ["{workspaceRoot}/dist/libs/state/schematics"]
     },
     "test": {
-      "executor": "@nx/jest:jest",
+      "executor": "@analogjs/vitest-angular:test",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "libs/rx-stateful/jest.config.ts"
+        "config": "libs/rx-stateful/vite.config.ts"
       }
     },
     "lint": {
