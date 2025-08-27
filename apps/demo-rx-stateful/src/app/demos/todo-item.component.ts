@@ -1,10 +1,10 @@
 import {Component, Input} from '@angular/core';
 import {Todo} from "../types";
 import {MatIconModule} from "@angular/material/icon";
-import {NgIf} from "@angular/common";
+
 
 @Component({
-    imports: [MatIconModule, NgIf],
+    imports: [MatIconModule],
     selector: 'todo-item',
     template: `
     <div class="flex gap-4 ">
@@ -12,18 +12,17 @@ import {NgIf} from "@angular/common";
         {{todo.id}}
       </div>
       <div class="w-12">
-        <ng-container *ngIf="todo.completed; else openTpl">
+        @if (todo.completed) {
           <mat-icon>check</mat-icon>
-        </ng-container>
-        <ng-template #openTpl>
+        } @else {
           <mat-icon>close</mat-icon>
-        </ng-template>
+        }
       </div>
       <div>
         {{todo.title}}
       </div>
     </div>
-  `,
+    `,
     styles: [`
     :host {
       display:block;

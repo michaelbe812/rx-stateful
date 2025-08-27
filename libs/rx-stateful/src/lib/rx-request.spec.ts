@@ -417,7 +417,7 @@ describe(rxRequest.name, () => {
             source$.next(throwError(() => new Error('error')));
 
             expect(beforeHandleErrorFn).toHaveBeenCalledWith(Error('error'));
-            expect(beforeHandleErrorFn).toBeCalledTimes(1);
+            expect(beforeHandleErrorFn).toHaveBeenCalledTimes(1);
           });
           test('should use errorMappingFn', () => {
             runWithTestScheduler(({ expectObservable, cold }) => {
@@ -566,7 +566,7 @@ describe(rxRequest.name, () => {
 
             expect(beforeHandleErrorFn).toHaveBeenCalledWith(Error('error'));
             // TODO this needs investigation
-            expect(beforeHandleErrorFn).toBeCalledTimes(2);
+            expect(beforeHandleErrorFn).toHaveBeenCalledTimes(2);
           });
           test('should use errorMappingFn', () => {
             runWithTestScheduler(({ expectObservable, cold }) => {
