@@ -111,10 +111,10 @@ export function createState$<T, A, E>(
       scan(accumulationFn, {
         isLoading: false,
         isRefreshing: false,
-        value: null,
+        value: undefined,
         error: undefined,
         context: 'suspense',
-      } as InternalRxState<T, E>),
+      } as any),
       distinctUntilChanged(),
       shareWithReplay(),
       _handleSyncValue()
@@ -154,10 +154,10 @@ export function createState$<T, A, E>(
       scan(accumulationFn, {
         isLoading: false,
         isRefreshing: false,
-        value: null,
+        value: undefined,
         error: undefined,
         context: 'suspense',
-      } as InternalRxState<T, E>),
+      } as any),
       distinctUntilChanged(),
       shareWithReplay(),
       _handleSyncValue()
