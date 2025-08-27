@@ -1,10 +1,11 @@
 import { rxRequest } from './rx-request';
-import { TestScheduler, RunHelpers } from 'rxjs/testing';
-import {mergeAll, of, Subject, throwError} from 'rxjs';
+import { RunHelpers, TestScheduler } from 'rxjs/testing';
+import { mergeAll, of, Subject, throwError } from 'rxjs';
 import { RxStateful, RxStatefulConfig } from './types/types';
 import { withRefetchOnTrigger } from './refetch-strategies/refetch-on-trigger.strategy';
-import {subscribeSpyTo} from "@hirez_io/observer-spy";
-import {TestBed} from "@angular/core/testing";
+import { subscribeSpyTo } from '@hirez_io/observer-spy';
+import { TestBed } from '@angular/core/testing';
+import { provideRxStatefulConfig } from './config/rx-stateful-config';
 
 function test(label: string, callback: () => void) {
   it(label, () => {
@@ -26,7 +27,7 @@ describe(rxRequest.name, () => {
           const source$ = rxRequest({
             requestFn: () => of(1),
             config: defaultConfig,
-          })
+          });
           const expected = 's';
 
           expectObservable(source$.value$()).toBe(
@@ -58,9 +59,9 @@ describe(rxRequest.name, () => {
               requestFn: () => s$,
               config: {
                 ...defaultConfig,
-                refetchStrategies: withRefetchOnTrigger(refresh$)
-              }
-            })
+                refetchStrategies: withRefetchOnTrigger(refresh$),
+              },
+            });
 
             expectObservable(source$.value$()).toBe(
               expected,
@@ -108,9 +109,9 @@ describe(rxRequest.name, () => {
               config: {
                 ...defaultConfig,
                 keepValueOnRefresh: true,
-                refetchStrategies: withRefetchOnTrigger(refresh$)
-              }
-            })
+                refetchStrategies: withRefetchOnTrigger(refresh$),
+              },
+            });
 
             expectObservable(source$.value$()).toBe(
               expected,
@@ -216,9 +217,8 @@ describe(rxRequest.name, () => {
             config: {
               ...defaultConfig,
               refetchStrategies: [withRefetchOnTrigger(refresh)],
-            }
-
-          })
+            },
+          });
 
           expectObservable(source$.value$()).toBe(
             expected,
@@ -268,8 +268,8 @@ describe(rxRequest.name, () => {
           const source$ = rxRequest({
             trigger,
             requestFn: (n) => s$(n),
-            config: {...defaultConfig, keepValueOnRefresh: true, refetchStrategies: [withRefetchOnTrigger(refresh)]}
-          })
+            config: { ...defaultConfig, keepValueOnRefresh: true, refetchStrategies: [withRefetchOnTrigger(refresh)] },
+          });
 
           expectObservable(source$.value$()).toBe(
             expected,
@@ -327,8 +327,8 @@ describe(rxRequest.name, () => {
                 config: {
                   ...defaultConfig,
                   refetchStrategies: [withRefetchOnTrigger(refresh$)],
-                }
-              })
+                },
+              });
 
               expectObservable(source$.value$()).toBe(
                 expected,
@@ -366,8 +366,8 @@ describe(rxRequest.name, () => {
                   ...defaultConfig,
                   keepErrorOnRefresh: true,
                   refetchStrategies: [withRefetchOnTrigger(refresh$)],
-                }
-              })
+                },
+              });
 
               expectObservable(source$.value$()).toBe(
                 expected,
@@ -409,10 +409,10 @@ describe(rxRequest.name, () => {
                 requestFn: () => source$.pipe(mergeAll()),
                 config: {
                   ...defaultConfig,
-                  beforeHandleErrorFn
-                }
+                  beforeHandleErrorFn,
+                },
               }).value$()
-            )
+            );
 
             source$.next(throwError(() => new Error('error')));
 
@@ -432,8 +432,8 @@ describe(rxRequest.name, () => {
                   ...defaultConfig,
                   errorMappingFn: (error: Error) => error.message,
                   refetchStrategies: [withRefetchOnTrigger(refresh$)],
-                }
-              })
+                },
+              });
 
               expectObservable(source$.value$()).toBe(
                 expected,
@@ -473,9 +473,9 @@ describe(rxRequest.name, () => {
                 trigger: trigger$,
                 requestFn: (n: number) => s$,
                 config: {
-                  ...defaultConfig
-                }
-              })
+                  ...defaultConfig,
+                },
+              });
 
               expectObservable(source$.value$()).toBe(
                 expected,
@@ -513,8 +513,8 @@ describe(rxRequest.name, () => {
                 config: {
                   ...defaultConfig,
                   keepErrorOnRefresh: true,
-                }
-              })
+                },
+              });
 
               expectObservable(source$.value$()).toBe(
                 expected,
@@ -548,19 +548,21 @@ describe(rxRequest.name, () => {
             });
           });
           test('should execute beforeHandleErrorFn', () => {
-            const trigger$ = new Subject<any>()
+            const trigger$ = new Subject<any>();
             const beforeHandleErrorFn = jest.fn();
 
-            const source$ = subscribeSpyTo(rxRequest({
-              trigger: trigger$,
-              requestFn: () => throwError(() => new Error('error')),
-              config: {
-                ...defaultConfig,
-                beforeHandleErrorFn
-              }
-            }).value$())
+            const source$ = subscribeSpyTo(
+              rxRequest({
+                trigger: trigger$,
+                requestFn: () => throwError(() => new Error('error')),
+                config: {
+                  ...defaultConfig,
+                  beforeHandleErrorFn,
+                },
+              }).value$()
+            );
 
-            trigger$.next(null)
+            trigger$.next(null);
 
             expect(beforeHandleErrorFn).toHaveBeenCalledWith(Error('error'));
             // TODO this needs investigation
@@ -580,8 +582,8 @@ describe(rxRequest.name, () => {
                   ...defaultConfig,
                   // @ts-ignore
                   errorMappingFn: (error: Error) => error.message,
-                }
-              })
+                },
+              });
 
               expectObservable(source$.value$()).toBe(
                 expected,
@@ -633,9 +635,9 @@ describe(rxRequest.name, () => {
             requestFn: () => s$,
             config: {
               ...defaultConfig,
-              refetchStrategies: [withRefetchOnTrigger(refresh$)]
-            }
-          })
+              refetchStrategies: [withRefetchOnTrigger(refresh$)],
+            },
+          });
           expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
@@ -663,9 +665,9 @@ describe(rxRequest.name, () => {
           const source$ = rxRequest({
             requestFn: () => s$,
             config: {
-              ...defaultConfig
-            }
-          })
+              ...defaultConfig,
+            },
+          });
 
           expectObservable(source$.value$()).toBe(
             expected,
@@ -702,9 +704,9 @@ describe(rxRequest.name, () => {
           const source$ = rxRequest({
             requestFn: () => s$,
             config: {
-              ...defaultConfig
-            }
-          })
+              ...defaultConfig,
+            },
+          });
           expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
@@ -746,9 +748,8 @@ describe(rxRequest.name, () => {
             requestFn: (n) => s$(n),
             config: {
               ...defaultConfig,
-
-            }
-          })
+            },
+          });
 
           expectObservable(source$.value$()).toBe(
             expected,
@@ -788,9 +789,9 @@ describe(rxRequest.name, () => {
             trigger: trigger$,
             requestFn: (n) => s$(n),
             config: {
-              ...defaultConfig
-            }
-          })
+              ...defaultConfig,
+            },
+          });
           expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
@@ -836,9 +837,9 @@ describe(rxRequest.name, () => {
             trigger: trigger$,
             requestFn: (n) => s$(n),
             config: {
-              ...defaultConfig
-            }
-          })
+              ...defaultConfig,
+            },
+          });
           expectObservable(source$.value$()).toBe(
             expected,
             marbelize({
@@ -865,6 +866,134 @@ describe(rxRequest.name, () => {
                 value: null,
                 hasValue: false,
                 isSuspense: true,
+              },
+            })
+          );
+        });
+      });
+    });
+  });
+
+  describe('config', () => {
+    const defaultConfig: RxStatefulConfig<any> = {
+      suspenseTimeMs: 0,
+      suspenseThresholdMs: 0,
+      keepValueOnRefresh: false,
+      keepErrorOnRefresh: false,
+    };
+    it('should apply global config', async () => {
+      await TestBed.configureTestingModule({
+        providers: [provideRxStatefulConfig({ keepValueOnRefresh: true })],
+      }).compileComponents();
+      TestBed.runInInjectionContext(() => {
+        runWithTestScheduler(({ expectObservable, cold }) => {
+          const s$ = cold('-a|', { a: 1 });
+          const refresh$ = cold('---a-', { a: void 0 });
+          const expected = 'za-yb-';
+
+          const source$ = rxRequest({
+            requestFn: () => s$,
+            config: {
+              suspenseTimeMs: 0,
+              suspenseThresholdMs: 0,
+              keepErrorOnRefresh: false,
+              refetchStrategies: withRefetchOnTrigger(refresh$),
+            },
+          });
+
+          expectObservable(source$.value$()).toBe(
+            expected,
+            marbelize({
+              z: {
+                hasError: false,
+                error: undefined,
+                context: 'suspense',
+                // value: null,
+                hasValue: false,
+                isSuspense: true,
+              },
+              y: {
+                hasError: false,
+                error: undefined,
+                context: 'suspense',
+                value: 1,
+                hasValue: true,
+                isSuspense: true,
+              },
+              a: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 1,
+                hasValue: true,
+                isSuspense: false,
+              },
+              b: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 1,
+                hasValue: true,
+                isSuspense: false,
+              },
+            })
+          );
+        });
+      });
+    });
+    it('should override global config with options', async () => {
+      await TestBed.configureTestingModule({
+        providers: [provideRxStatefulConfig({ keepValueOnRefresh: true })],
+      }).compileComponents();
+      TestBed.runInInjectionContext(() => {
+        runWithTestScheduler(({ expectObservable, cold }) => {
+          const s$ = cold('-a|', { a: 1 });
+          const refresh$ = cold('---a-', { a: void 0 });
+          const expected = 'za-yb-';
+
+          const source$ = rxRequest({
+            requestFn: () => s$,
+            config: {
+              ...defaultConfig,
+              keepValueOnRefresh: false,
+              refetchStrategies: withRefetchOnTrigger(refresh$),
+            },
+          });
+
+          expectObservable(source$.value$()).toBe(
+            expected,
+            marbelize({
+              z: {
+                hasError: false,
+                error: undefined,
+                context: 'suspense',
+                value: null,
+                hasValue: false,
+                isSuspense: true,
+              },
+              y: {
+                hasError: false,
+                error: undefined,
+                context: 'suspense',
+                value: null,
+                hasValue: false,
+                isSuspense: true,
+              },
+              a: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 1,
+                hasValue: true,
+                isSuspense: false,
+              },
+              b: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 1,
+                hasValue: true,
+                isSuspense: false,
               },
             })
           );
