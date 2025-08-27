@@ -7,10 +7,9 @@ import { provideRxStatefulClient, RxStatefulClient, withConfig } from '@angular-
 import { rxRequest, withRefetchOnTrigger } from '@angular-kit/rx-stateful';
 
 @Component({
-  selector: 'demo-non-flicker',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'demo-non-flicker',
+    imports: [CommonModule],
+    template: `
     <h1>DemoRxStatefulComponent Non Flicker</h1>
     <!--    <div>-->
     <!--      <button (click)="refresh$$.next(null)">refresh</button>-->
@@ -47,15 +46,15 @@ import { rxRequest, withRefetchOnTrigger } from '@angular-kit/rx-stateful';
       </div>
     </div>
   `,
-  styles: `
+    styles: `
     :host {
       display: block;
     }
   `,
-  providers: [
-    provideRxStatefulClient(withConfig({ keepValueOnRefresh: false, errorMappingFn: (e) => e })),
-    // provideRxStatefulConfig({keepValueOnRefresh: true, errorMappingFn: (e) => e})
-  ],
+    providers: [
+        provideRxStatefulClient(withConfig({ keepValueOnRefresh: false, errorMappingFn: (e) => e })),
+        // provideRxStatefulConfig({keepValueOnRefresh: true, errorMappingFn: (e) => e})
+    ]
 })
 export class NonFlickerComponent {
   private http = inject(HttpClient);

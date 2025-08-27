@@ -6,10 +6,9 @@ import {BehaviorSubject, map, of, scan, startWith, Subject, timer} from "rxjs";
 import {AsyncPipe, JsonPipe} from "@angular/common";
 
 @Component({
-  standalone: true,
-  imports: [RouterModule, NavigationComponent, AsyncPipe, JsonPipe],
-  selector: 'demo-root',
-  template: `
+    imports: [RouterModule, NavigationComponent, AsyncPipe, JsonPipe],
+    selector: 'demo-root',
+    template: `
     <h1>RxStateful Demo</h1>
     <p>Select one of the demos from the tabs below</p>
     <navigation />
@@ -21,14 +20,14 @@ import {AsyncPipe, JsonPipe} from "@angular/common";
 <!--    <hr>-->
 <!--    {{ req2.value$() | async | json }}-->
   `,
-  styles: [
-    `
+    styles: [
+        `
       :host {
         display: block;
         padding: 32px 64px 32px 64px;
       }
     `,
-  ],
+    ]
 })
 export class AppComponent {
   title = 'demo-rx-stateful';

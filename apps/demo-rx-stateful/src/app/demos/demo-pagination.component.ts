@@ -20,10 +20,9 @@ import {MatCardModule} from "@angular/material/card";
 
 
 @Component({
-  standalone: true,
-  imports: [RouterModule, MatExpansionModule, HighlightModule, MatPaginatorModule, MatTableModule, MatButtonModule, AsyncPipe, MatListModule, MatProgressSpinnerModule, NgForOf, NgIf, TodoItemComponent, MatCardModule],
-  selector: 'demo-pagination',
-  template: `
+    imports: [RouterModule, MatExpansionModule, HighlightModule, MatPaginatorModule, MatTableModule, MatButtonModule, AsyncPipe, MatListModule, MatProgressSpinnerModule, NgForOf, NgIf, TodoItemComponent, MatCardModule],
+    selector: 'demo-pagination',
+    template: `
      <h1>Pagination Example</h1>
     <div>
       <p>Change pages by clicking next or previous page</p>
@@ -72,7 +71,7 @@ import {MatCardModule} from "@angular/material/card";
     </mat-card>
     </div>
 `,
-  styles: ['']
+    styles: ['']
 })
 export class DemoPaginationComponent   {
   code = `

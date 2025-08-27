@@ -5,10 +5,9 @@ import {NgForOf} from "@angular/common";
 import {appRoutes} from "./app.routes";
 
 @Component({
-  standalone: true,
-  imports: [RouterModule, MatTabsModule, NgForOf],
-  selector: 'navigation',
-  template: `
+    imports: [RouterModule, MatTabsModule, NgForOf],
+    selector: 'navigation',
+    template: `
     <nav mat-tab-nav-bar  [tabPanel]="tabPanel">
       <a mat-tab-link *ngFor="let link of links"
          (click)="activeLink = link"
@@ -20,7 +19,7 @@ import {appRoutes} from "./app.routes";
       <router-outlet></router-outlet>
     </mat-tab-nav-panel>
   `,
-  styles: [``],
+    styles: [``]
 })
 export class NavigationComponent {
 

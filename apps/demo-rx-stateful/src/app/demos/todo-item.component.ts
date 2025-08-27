@@ -4,10 +4,9 @@ import {MatIconModule} from "@angular/material/icon";
 import {NgIf} from "@angular/common";
 
 @Component({
-  standalone: true,
-  imports: [ MatIconModule, NgIf],
-  selector: 'todo-item',
-  template: `
+    imports: [MatIconModule, NgIf],
+    selector: 'todo-item',
+    template: `
     <div class="flex gap-4 ">
       <div class="w-12">
         {{todo.id}}
@@ -25,12 +24,12 @@ import {NgIf} from "@angular/common";
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     :host {
       display:block;
       padding: 32px 64px 32px 64px;
     }
-  `],
+  `]
 })
 export class TodoItemComponent {
   @Input({required: true}) todo!: Todo;

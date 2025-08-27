@@ -36,4 +36,10 @@ module.exports = [
     files: ['libs/rx-stateful/**/*.html'],
     rules: {},
   })),
+  {
+    files: ['**/*.ts'],
+    rules: {
+      '@angular-eslint/prefer-standalone': 'off',
+    },
+  },
 ];

@@ -14,10 +14,9 @@ import {TodoItemComponent} from "./todo-item.component";
 import {MatCardModule} from "@angular/material/card";
 
 @Component({
-  standalone: true,
-  imports: [RouterModule, MatButtonModule, NgIf, AsyncPipe, MatProgressSpinnerModule, MatListModule, NgForOf, HighlightModule, MatExpansionModule, TodoItemComponent, MatCardModule],
-  selector: 'demo-basic-usage',
-  template: `
+    imports: [RouterModule, MatButtonModule, NgIf, AsyncPipe, MatProgressSpinnerModule, MatListModule, NgForOf, HighlightModule, MatExpansionModule, TodoItemComponent, MatCardModule],
+    selector: 'demo-basic-usage',
+    template: `
     <h1>Basic Usage</h1>
     <mat-expansion-panel>
       <mat-expansion-panel-header>
@@ -57,12 +56,12 @@ import {MatCardModule} from "@angular/material/card";
       </mat-card>
     </div>
   `,
-  styles: [`
+    styles: [`
   .list-container {
     max-height: 400px;
     overflow: scroll;
   }
-  `],
+  `]
 })
 export class DemoBasicUsageComponent {
   /**
