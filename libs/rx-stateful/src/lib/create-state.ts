@@ -21,6 +21,7 @@ import {
   tap,
   timer,
   withLatestFrom,
+  OperatorFunction,
 } from 'rxjs';
 import { InternalRxState, RxStatefulConfig, RxStatefulSourceTriggerConfig, RxStatefulWithError } from './types/types';
 import { shareWithReplay } from './util/share-operators';
@@ -58,7 +59,7 @@ export function createState$<T, A, E>(
      */
     const sourceTrigger$ = (mergedConfig as RxStatefulSourceTriggerConfig<T, A, E>)?.sourceTriggerConfig.trigger;
 
-    const valueFromSourceTrigger$ = sourceTrigger$.pipe(
+    const valueFromSourceTrigger$: Observable<Partial<InternalRxState<T, E>>> = sourceTrigger$.pipe(
       tap((arg) => (cachedArgument = arg)),
       applyFlatteningOperator(
         (mergedConfig as RxStatefulSourceTriggerConfig<T, A, E>)?.sourceTriggerConfig?.operator,
@@ -77,7 +78,7 @@ export function createState$<T, A, E>(
     /**
      * value when we refresh
      */
-    const refreshedValue$ = refreshTrigger$.pipe(
+    const refreshedValue$: Observable<Partial<InternalRxState<T, E>>> = refreshTrigger$.pipe(
       /**
        * If cachedArgument is undefined, we skip the refresh.
        * This can happen if refresh is triggered before the sourceTrigger has emitted.
@@ -168,7 +169,7 @@ export function createState$<T, A, E>(
   return of({} as InternalRxState<T>);
 }
 
-function deriveInitialValue<T, E>(mergedConfig: RxStatefulConfig<T, E>) {
+function deriveInitialValue<T, E>(mergedConfig: RxStatefulConfig<T, E>): OperatorFunction<any, Partial<InternalRxState<T, E>>> {
   // TODO for first emission set isRefreshing to false
   let value: Partial<InternalRxState<T, E>> = {
     isLoading: true,
