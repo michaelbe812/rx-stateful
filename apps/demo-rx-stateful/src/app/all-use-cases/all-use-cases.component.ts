@@ -32,11 +32,10 @@ export class DataService {
 }
 
 @Component({
-  selector: 'demo-all-use-cases',
-  standalone: true,
-  imports: [CommonModule, RxStatefulStateVisualizerComponent, NonFlickerComponent],
-  templateUrl: './all-use-cases.component.html',
-  styleUrl: './all-use-cases.component.scss',
+    selector: 'demo-all-use-cases',
+    imports: [CommonModule, RxStatefulStateVisualizerComponent, NonFlickerComponent],
+    templateUrl: './all-use-cases.component.html',
+    styleUrl: './all-use-cases.component.scss'
 })
 export class AllUseCasesComponent {
   private readonly http = inject(HttpClient);

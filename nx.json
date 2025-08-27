@@ -68,5 +68,6 @@
       "style": "scss"
     }
   },
-  "defaultBase": "main"
+  "defaultBase": "main",
+  "useLegacyCache": true
 }

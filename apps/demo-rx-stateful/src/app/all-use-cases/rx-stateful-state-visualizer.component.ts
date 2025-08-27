@@ -8,10 +8,9 @@ type Input = {
 }
 
 @Component({
-  selector: 'rx-stateful-state-visualizer',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'rx-stateful-state-visualizer',
+    imports: [CommonModule],
+    template: `
     <ul>
       @for(s of state(); track s.index){
         <li>{{s |json}}</li>
