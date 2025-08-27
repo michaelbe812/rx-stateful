@@ -100,5 +100,8 @@
     "ts-node": "10.9.1",
     "typescript": "5.8.3",
     "jest-util": "30.0.5"
+  },
+  "engines": {
+    "node": "22.16.0"
   }
 }
