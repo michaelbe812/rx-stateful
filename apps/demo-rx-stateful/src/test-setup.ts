@@ -1,1 +1,1 @@
-import '@analogjs/vite-plugin-angular/setup-zone';
+import '@analogjs/vitest-angular/setup-zone';
