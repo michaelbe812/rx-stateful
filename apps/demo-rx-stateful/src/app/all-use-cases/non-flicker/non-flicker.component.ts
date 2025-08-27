@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, concatAll, delay, map, scan, Subject, switchMap, tap, toArray } from 'rxjs';
 import { provideRxStatefulClient, RxStatefulClient, withConfig } from '@angular-kit/rx-stateful/experimental';
-import { rxRequest, rxStateful$, withRefetchOnTrigger } from '@angular-kit/rx-stateful';
+import { rxRequest, withRefetchOnTrigger } from '@angular-kit/rx-stateful';
 
 @Component({
   selector: 'demo-non-flicker',

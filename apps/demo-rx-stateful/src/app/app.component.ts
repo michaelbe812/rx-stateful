@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {NavigationComponent} from "./navigation.component";
-import {rxStateful$, rxRequest, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
+import {rxRequest, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
 import {BehaviorSubject, map, of, scan, startWith, Subject, timer} from "rxjs";
 import {AsyncPipe, JsonPipe} from "@angular/common";
 
@@ -37,7 +37,10 @@ export class AppComponent {
   page$$ = new BehaviorSubject<number>(1);
 
   page$ = this.page$$.pipe(scan((acc) => acc + 1, 0));
-  stateful = rxStateful$(of('Hello'), {keepErrorOnRefresh: true})
+  stateful = rxRequest({
+    requestFn: () => of('Hello'),
+    config: {keepErrorOnRefresh: true}
+  })
   req = rxRequest({
     requestFn: () => timer(10).pipe(map(() => 'Hello')),
     config: {
