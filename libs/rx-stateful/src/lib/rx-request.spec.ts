@@ -402,7 +402,7 @@ describe(rxRequest.name, () => {
           });
           test('should execute beforeHandleErrorFn', () => {
             const source$ = new Subject<any>();
-            const beforeHandleErrorFn = jest.fn();
+            const beforeHandleErrorFn = vi.fn();
 
             const result = subscribeSpyTo(
               rxRequest({
@@ -549,7 +549,7 @@ describe(rxRequest.name, () => {
           });
           test('should execute beforeHandleErrorFn', () => {
             const trigger$ = new Subject<any>();
-            const beforeHandleErrorFn = jest.fn();
+            const beforeHandleErrorFn = vi.fn();
 
             const source$ = subscribeSpyTo(
               rxRequest({

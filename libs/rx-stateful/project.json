@@ -43,7 +43,7 @@
       "executor": "@analogjs/vitest-angular:test",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "config": "libs/rx-stateful/vite.config.ts"
+        "config": "vite.config.ts"
       }
     },
     "lint": {

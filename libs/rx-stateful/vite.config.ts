@@ -9,6 +9,10 @@ export default defineConfig({
     angular(),
     nxViteTsPaths()
   ],
+  resolve: {
+    extensions: ['.ts', '.js', '.json'],
+    preserveSymlinks: true
+  },
   test: {
     globals: true,
     environment: 'jsdom',
