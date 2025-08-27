@@ -4,7 +4,7 @@ import {MatButtonModule} from "@angular/material/button";
 import {async, delay, Subject} from "rxjs";
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import {rxRequest, withAutoRefetch, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
-import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
+import { AsyncPipe } from "@angular/common";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import { Todo } from '../types';
 import {MatListModule} from "@angular/material/list";
@@ -14,7 +14,7 @@ import {TodoItemComponent} from "./todo-item.component";
 import {MatCardModule} from "@angular/material/card";
 
 @Component({
-    imports: [RouterModule, MatButtonModule, NgIf, AsyncPipe, MatProgressSpinnerModule, MatListModule, NgForOf, HighlightModule, MatExpansionModule, TodoItemComponent, MatCardModule],
+    imports: [RouterModule, MatButtonModule, AsyncPipe, MatProgressSpinnerModule, MatListModule, HighlightModule, MatExpansionModule, TodoItemComponent, MatCardModule],
     selector: 'demo-basic-usage',
     template: `
     <h1>Basic Usage</h1>
@@ -31,31 +31,35 @@ import {MatCardModule} from "@angular/material/card";
     <div>
       <button mat-button color="primary" (click)="request.refresh()"> Refresh</button>
       <br>
-      <mat-card class="px-8 py-4 h-[400px]">
-        <div *ngIf="request.value$() | async as state">
-          <ng-container *ngIf="state.value">
-            <div class="list-container">
-              <mat-list role="list">
-                <mat-list-item *ngFor="let item of state.value" role="listitem">
-                  <todo-item [todo]="item"/>
-                </mat-list-item>
-              </mat-list>
-            </div>
-          </ng-container>
-          <ng-container *ngIf="state.isSuspense">
-            <div class="w-full h-full grid place-items-center\t">
-              <mat-spinner></mat-spinner>
-            </div>
-          </ng-container>
-          <ng-container *ngIf="state.hasError">
+        <mat-card class="px-8 py-4 h-[400px]">
+          @if (request.value$() | async; as state) {
             <div>
-              Error {{ state.error }}
+              @if (state.value) {
+                <div class="list-container">
+                  <mat-list role="list">
+                    @for (item of state.value; track item) {
+                      <mat-list-item role="listitem">
+                        <todo-item [todo]="item"/>
+                      </mat-list-item>
+                    }
+                  </mat-list>
+                </div>
+              }
+              @if (state.isSuspense) {
+                <div class="w-full h-full grid place-items-center\t">
+                  <mat-spinner></mat-spinner>
+                </div>
+              }
+              @if (state.hasError) {
+                <div>
+                  Error {{ state.error }}
+                </div>
+              }
             </div>
-          </ng-container>
-        </div>
-      </mat-card>
-    </div>
-  `,
+          }
+        </mat-card>
+      </div>
+    `,
     styles: [`
   .list-container {
     max-height: 400px;

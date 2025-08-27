@@ -32,7 +32,7 @@ import { rxRequest, withRefetchOnTrigger } from '@angular-kit/rx-stateful';
     <!--      <div>{{ query$ | async | json }}</div>-->
     <!--      <div>{{ value$ | async | json }}</div>-->
     <!--    </div>-->
-
+    
     <!--    <br>-->
     <div>
       <button mat-button color="primary" (click)="page$$.next(-1)">previous page</button>
@@ -40,12 +40,14 @@ import { rxRequest, withRefetchOnTrigger } from '@angular-kit/rx-stateful';
       <button mat-button color="primary" (click)="refresh$$.next(null)">Refresh current page</button>
       <div>
         <h4>State Accumulated</h4>
-        <ul *ngFor="let v of state2Accumulated$ | async">
-          <li>{{ v | json }}</li>
-        </ul>
+        @for (v of state2Accumulated$ | async; track v) {
+          <ul>
+            <li>{{ v | json }}</li>
+          </ul>
+        }
       </div>
     </div>
-  `,
+    `,
     styles: `
     :host {
       display: block;
