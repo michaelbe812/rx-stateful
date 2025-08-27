@@ -79,20 +79,17 @@ export function createState$<T, A, E>(
      */
     const refreshedValue$ = refreshTrigger$.pipe(
       /**
-       * TODO
-       * verify if we can safely ignore that cachedArgument is undefined.
-       * Theoretically we need to check if s$ has emitted a value before then cachedArgument is defined.
-       *
-       * TODO --> we definately need to handle it
+       * If cachedArgument is undefined, we skip the refresh.
+       * This can happen if refresh is triggered before the sourceTrigger has emitted.
        */
-
       switchMap(() =>
-        // @ts-ignore
-        sourceOrSourceFn$(cachedArgument).pipe(
+        cachedArgument !== undefined 
+          ? sourceOrSourceFn$(cachedArgument).pipe(
           map((v) => mapToValue(v)),
           deriveInitialValue<T, E>(mergedConfig),
           catchError((error: E) => handleError<T, E>(error, mergedConfig, error$$))
-        )
+          )
+          : NEVER
       ),
       shareWithReplay()
     );
@@ -106,27 +103,18 @@ export function createState$<T, A, E>(
     const pair2$ = pairLoadingWithResponse(s1, refreshedValue$);
 
     const finalResult$ = merge(
-      // @ts-ignore
-      race(pair1$, valueFromSourceTrigger$.pipe(filter((v) => v?.context !== 'suspense'))),
-      // @ts-ignore
-      race(pair2$, refreshedValue$.pipe(filter((v) => v?.context !== 'suspense')))
+      race(pair1$, valueFromSourceTrigger$.pipe(filter((v) => (v as InternalRxState<T, E>)?.context !== 'suspense'))),
+      race(pair2$, refreshedValue$.pipe(filter((v) => (v as InternalRxState<T, E>)?.context !== 'suspense')))
     );
 
     const result$ = merge(finalResult$, error$$).pipe(
-      /**
-       * todo
-       * this is a bit hacky as value can not be undefined (it is typed
-       * as T | null). However when I change to null some side effets happen.
-       * Need investigation!!!
-       */
-      // @ts-ignore
       scan(accumulationFn, {
         isLoading: false,
         isRefreshing: false,
-        value: undefined,
+        value: null,
         error: undefined,
         context: 'suspense',
-      }),
+      } as InternalRxState<T, E>),
       distinctUntilChanged(),
       shareWithReplay(),
       _handleSyncValue()
@@ -145,7 +133,6 @@ export function createState$<T, A, E>(
     const refresh$ = merge(new BehaviorSubject(null), ...mergeRefetchStrategies(mergedConfig?.refetchStrategies));
 
     const refreshedRequest$: Observable<Partial<InternalRxState<T, E>>> = refresh$.pipe(
-      // @ts-ignore
       switchMap(() =>
         sharedSource$.pipe(
           map((v) => mapToValue(v)),
@@ -164,20 +151,13 @@ export function createState$<T, A, E>(
     const result$ = race(pair$, refreshedRequest$.pipe(filter((v) => v.context !== 'suspense')));
 
     return merge(result$, error$$).pipe(
-      /**
-       * todo
-       * this is a bit hacky as value can not be undefined (it is typed
-       * as T | null). However when I change to null some side effets happen.
-       * Need investigation!!!
-       */
-      // @ts-ignore
       scan(accumulationFn, {
         isLoading: false,
         isRefreshing: false,
-        value: undefined,
+        value: null,
         error: undefined,
         context: 'suspense',
-      }),
+      } as InternalRxState<T, E>),
       distinctUntilChanged(),
       shareWithReplay(),
       _handleSyncValue()
