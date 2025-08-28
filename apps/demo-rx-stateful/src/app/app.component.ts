@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {NavigationComponent} from "./navigation.component";
 import {rxRequest, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
-import {BehaviorSubject, map, of, scan, startWith, Subject, timer} from "rxjs";
+import {BehaviorSubject, map, of, scan, Subject, timer} from "rxjs";
 import {AsyncPipe, JsonPipe} from "@angular/common";
 
 @Component({
