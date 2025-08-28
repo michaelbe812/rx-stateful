@@ -1,33 +1,32 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import {NavigationComponent} from "./navigation.component";
-import {rxRequest, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
-import {BehaviorSubject, map, of, scan, Subject, timer} from "rxjs";
-import {AsyncPipe, JsonPipe} from "@angular/common";
+import { NavigationComponent } from './navigation.component';
+import { rxRequest, withRefetchOnTrigger } from '@angular-kit/rx-stateful';
+import { BehaviorSubject, map, of, scan, Subject, timer } from 'rxjs';
 
 @Component({
-    imports: [RouterModule, NavigationComponent, AsyncPipe, JsonPipe],
-    selector: 'demo-root',
-    template: `
+  imports: [RouterModule, NavigationComponent],
+  selector: 'demo-root',
+  template: `
     <h1>RxStateful Demo</h1>
     <p>Select one of the demos from the tabs below</p>
     <navigation />
 
-<!--    <button (click)="refresh$$.next()">Refresh</button>-->
-<!--    <button (click)="page$$.next(1)">next page</button>-->
-<!--    {{ req.value$() | async | json }}-->
-<!--    <br>-->
-<!--    <hr>-->
-<!--    {{ req2.value$() | async | json }}-->
+    <!--    <button (click)="refresh$$.next()">Refresh</button>-->
+    <!--    <button (click)="page$$.next(1)">next page</button>-->
+    <!--    {{ req.value$() | async | json }}-->
+    <!--    <br>-->
+    <!--    <hr>-->
+    <!--    {{ req2.value$() | async | json }}-->
   `,
-    styles: [
-        `
+  styles: [
+    `
       :host {
         display: block;
         padding: 32px 64px 32px 64px;
       }
     `,
-    ]
+  ],
 })
 export class AppComponent {
   title = 'demo';
@@ -38,8 +37,8 @@ export class AppComponent {
   page$ = this.page$$.pipe(scan((acc) => acc + 1, 0));
   stateful = rxRequest({
     requestFn: () => of('Hello'),
-    config: {keepErrorOnRefresh: true}
-  })
+    config: { keepErrorOnRefresh: true },
+  });
   req = rxRequest({
     requestFn: () => timer(10).pipe(map(() => 'Hello')),
     config: {
