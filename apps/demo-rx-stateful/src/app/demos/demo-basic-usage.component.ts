@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import { RouterModule } from '@angular/router';
 import {MatButtonModule} from "@angular/material/button";
-import {async, delay, Subject} from "rxjs";
+import {delay} from "rxjs";
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import {rxRequest, withAutoRefetch, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
 import { AsyncPipe } from "@angular/common";
