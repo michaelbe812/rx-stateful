@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Injector } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { AsyncPipe, CommonModule } from '@angular/common';
@@ -12,8 +12,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatListModule } from '@angular/material/list';
 import { HighlightModule } from 'ngx-highlightjs';
-import { BehaviorSubject, Subject, delay, of, throwError, timer, switchMap, combineLatest, map, startWith } from 'rxjs';
-import { rxRequest, withRefetchOnTrigger, withAutoRefetch } from '@angular-kit/rx-stateful';
+import { combineLatest, map, startWith, Subject, switchMap, throwError, timer } from 'rxjs';
+import { rxRequest, withAutoRefetch, withRefetchOnTrigger } from '@angular-kit/rx-stateful';
 import { Todo } from '../types';
 import { TodoItemComponent } from './todo-item.component';
 
@@ -33,7 +33,7 @@ import { TodoItemComponent } from './todo-item.component';
     MatProgressSpinnerModule,
     MatListModule,
     HighlightModule,
-    TodoItemComponent
+    TodoItemComponent,
   ],
   template: `
     <h1>All-in-One rxRequest Demo</h1>
@@ -47,7 +47,6 @@ import { TodoItemComponent } from './todo-item.component';
         </mat-card-header>
         <mat-card-content>
           <form [formGroup]="configForm" class="config-form">
-            
             <!-- Request Type -->
             <div class="form-section">
               <h3>Request Type</h3>
@@ -59,15 +58,15 @@ import { TodoItemComponent } from './todo-item.component';
 
             <!-- Operator Selection -->
             @if (configForm.get('requestType')?.value === 'triggered') {
-              <div class="form-section">
-                <h3>Operator</h3>
-                <mat-select formControlName="operator">
-                  <mat-option value="switch">switch</mat-option>
-                  <mat-option value="merge">merge</mat-option>
-                  <mat-option value="concat">concat</mat-option>
-                  <mat-option value="exhaust">exhaust</mat-option>
-                </mat-select>
-              </div>
+            <div class="form-section">
+              <h3>Operator</h3>
+              <mat-select formControlName="operator">
+                <mat-option value="switch">switch</mat-option>
+                <mat-option value="merge">merge</mat-option>
+                <mat-option value="concat">concat</mat-option>
+                <mat-option value="exhaust">exhaust</mat-option>
+              </mat-select>
+            </div>
             }
 
             <!-- State Management -->
@@ -82,11 +81,11 @@ import { TodoItemComponent } from './todo-item.component';
               <h3>Suspense Configuration</h3>
               <mat-form-field>
                 <mat-label>Suspense Threshold (ms)</mat-label>
-                <input matInput type="number" formControlName="suspenseThresholdMs">
+                <input matInput type="number" formControlName="suspenseThresholdMs" />
               </mat-form-field>
               <mat-form-field>
                 <mat-label>Suspense Time (ms)</mat-label>
-                <input matInput type="number" formControlName="suspenseTimeMs">
+                <input matInput type="number" formControlName="suspenseTimeMs" />
               </mat-form-field>
             </div>
 
@@ -95,7 +94,7 @@ import { TodoItemComponent } from './todo-item.component';
               <h3>API Simulation</h3>
               <mat-form-field>
                 <mat-label>API Delay (ms)</mat-label>
-                <input matInput type="number" formControlName="apiDelay">
+                <input matInput type="number" formControlName="apiDelay" />
               </mat-form-field>
               <mat-checkbox formControlName="simulateError">Simulate API Errors</mat-checkbox>
               <mat-checkbox formControlName="useErrorMapping">Use Custom Error Mapping</mat-checkbox>
@@ -106,21 +105,20 @@ import { TodoItemComponent } from './todo-item.component';
               <h3>Refetch Strategies</h3>
               <mat-checkbox formControlName="enableManualRefetch">Manual Refetch Trigger</mat-checkbox>
               <mat-checkbox formControlName="enableAutoRefetch">Auto Refetch</mat-checkbox>
-              
+
               @if (configForm.get('enableAutoRefetch')?.value) {
-                <div class="nested-config">
-                  <mat-form-field>
-                    <mat-label>Auto Refetch Interval (ms)</mat-label>
-                    <input matInput type="number" formControlName="autoRefetchInterval">
-                  </mat-form-field>
-                  <mat-form-field>
-                    <mat-label>Auto Refetch Duration (ms)</mat-label>
-                    <input matInput type="number" formControlName="autoRefetchDuration">
-                  </mat-form-field>
-                </div>
+              <div class="nested-config">
+                <mat-form-field>
+                  <mat-label>Auto Refetch Interval (ms)</mat-label>
+                  <input matInput type="number" formControlName="autoRefetchInterval" />
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>Auto Refetch Duration (ms)</mat-label>
+                  <input matInput type="number" formControlName="autoRefetchDuration" />
+                </mat-form-field>
+              </div>
               }
             </div>
-
           </form>
         </mat-card-content>
       </mat-card>
@@ -131,19 +129,14 @@ import { TodoItemComponent } from './todo-item.component';
           <mat-card-title>Live Demo</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          
           <!-- Controls -->
           <div class="demo-controls">
             @if (configForm.get('enableManualRefetch')?.value) {
-              <button mat-raised-button color="primary" (click)="manualTrigger$$.next()">
-                Manual Refresh
-              </button>
-            }
-            
-            @if (configForm.get('requestType')?.value === 'triggered') {
-              <button mat-raised-button color="accent" (click)="triggerRequest()">
-                Trigger Request (#{{ requestCounter }})
-              </button>
+            <button mat-raised-button color="primary" (click)="manualTrigger$$.next()">Manual Refresh</button>
+            } @if (configForm.get('requestType')?.value === 'triggered') {
+            <button mat-raised-button color="accent" (click)="triggerRequest()">
+              Trigger Request (#{{ requestCounter }})
+            </button>
             }
 
             <button mat-raised-button (click)="reset()">Reset</button>
@@ -152,49 +145,43 @@ import { TodoItemComponent } from './todo-item.component';
           <!-- State Display -->
           <div class="state-display">
             @if (dynamicRequest$ | async; as state) {
-              <div class="state-info">
-                <div class="state-badges">
-                  <span class="badge" [class.active]="state.isSuspense">Loading: {{ state.isSuspense }}</span>
-                  <span class="badge" [class.active]="state.hasValue">Has Value: {{ state.hasValue }}</span>
-                  <span class="badge" [class.active]="state.hasError">Has Error: {{ state.hasError }}</span>
-                  <span class="badge">Context: {{ state.context }}</span>
-                </div>
-                
-                @if (state.isSuspense) {
-                  <div class="loading-indicator">
-                    <mat-spinner diameter="30"></mat-spinner>
-                    <span>Loading...</span>
-                  </div>
-                }
-                
-                @if (state.hasValue) {
-                  <div class="value-display">
-                    <h4>Value:</h4>
-                    @if (state.value; as todos) {
-                      <mat-list>
-                        @for (todo of todos.slice(0, 5); track todo.id) {
-                          <mat-list-item>
-                            <todo-item [todo]="todo"/>
-                          </mat-list-item>
-                        }
-                      </mat-list>
-                      @if (todos.length > 5) {
-                        <p>... and {{ todos.length - 5 }} more todos</p>
-                      }
-                    }
-                  </div>
-                }
-                
-                @if (state.hasError) {
-                  <div class="error-display">
-                    <h4>Error:</h4>
-                    <pre>{{ state.error }}</pre>
-                  </div>
-                }
+            <div class="state-info">
+              <div class="state-badges">
+                <span class="badge" [class.active]="state.isSuspense">Loading: {{ state.isSuspense }}</span>
+                <span class="badge" [class.active]="state.hasValue">Has Value: {{ state.hasValue }}</span>
+                <span class="badge" [class.active]="state.hasError">Has Error: {{ state.hasError }}</span>
+                <span class="badge">Context: {{ state.context }}</span>
               </div>
+
+              @if (state.isSuspense) {
+              <div class="loading-indicator">
+                <mat-spinner diameter="30"></mat-spinner>
+                <span>Loading...</span>
+              </div>
+              } @if (state.hasValue) {
+              <div class="value-display">
+                <h4>Value:</h4>
+                @if (state.value; as todos) {
+                <mat-list>
+                  @for (todo of todos.slice(0, 5); track todo.id) {
+                  <mat-list-item>
+                    <todo-item [todo]="todo" />
+                  </mat-list-item>
+                  }
+                </mat-list>
+                @if (todos.length > 5) {
+                <p>... and {{ todos.length - 5 }} more todos</p>
+                } }
+              </div>
+              } @if (state.hasError) {
+              <div class="error-display">
+                <h4>Error:</h4>
+                <pre>{{ state.error }}</pre>
+              </div>
+              }
+            </div>
             }
           </div>
-
         </mat-card-content>
       </mat-card>
     </div>
@@ -207,137 +194,139 @@ import { TodoItemComponent } from './todo-item.component';
       </mat-card-header>
       <mat-card-content>
         <mat-expansion-panel expanded>
-          <mat-expansion-panel-header>
-            TypeScript Code
-          </mat-expansion-panel-header>
+          <mat-expansion-panel-header> TypeScript Code </mat-expansion-panel-header>
           <pre><code [highlight]="generatedCode$ | async" language="typescript"></code></pre>
         </mat-expansion-panel>
       </mat-card-content>
     </mat-card>
   `,
-  styles: [`
-    .demo-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-    
-    .config-panel {
-      height: fit-content;
-    }
-    
-    .demo-panel {
-      height: fit-content;
-    }
-    
-    .code-panel {
-      grid-column: 1 / -1;
-    }
-    
-    .config-form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    
-    .form-section {
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      padding: 16px;
-    }
-    
-    .form-section h3 {
-      margin: 0 0 12px 0;
-      font-size: 14px;
-      font-weight: 500;
-      color: #424242;
-    }
-    
-    .nested-config {
-      margin-top: 12px;
-      padding-left: 16px;
-      border-left: 2px solid #e0e0e0;
-    }
-    
-    .demo-controls {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-    
-    .state-display {
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      padding: 16px;
-      min-height: 200px;
-    }
-    
-    .state-badges {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
-    
-    .badge {
-      padding: 4px 8px;
-      border-radius: 4px;
-      background-color: #f5f5f5;
-      font-size: 12px;
-      border: 1px solid #e0e0e0;
-    }
-    
-    .badge.active {
-      background-color: #e3f2fd;
-      border-color: #2196f3;
-      color: #1976d2;
-    }
-    
-    .loading-indicator {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 20px 0;
-    }
-    
-    .value-display, .error-display {
-      margin-top: 16px;
-    }
-    
-    .error-display {
-      color: #d32f2f;
-    }
-    
-    .error-display pre {
-      background-color: #ffebee;
-      padding: 8px;
-      border-radius: 4px;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
+  styles: [
+    `
+      .demo-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
 
-    mat-form-field {
-      width: 100%;
-      margin-bottom: 8px;
-    }
+      .config-panel {
+        height: fit-content;
+      }
 
-    mat-checkbox {
-      margin-bottom: 8px;
-    }
+      .demo-panel {
+        height: fit-content;
+      }
 
-    mat-radio-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-  `]
+      .code-panel {
+        grid-column: 1 / -1;
+      }
+
+      .config-form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .form-section {
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 16px;
+      }
+
+      .form-section h3 {
+        margin: 0 0 12px 0;
+        font-size: 14px;
+        font-weight: 500;
+        color: #424242;
+      }
+
+      .nested-config {
+        margin-top: 12px;
+        padding-left: 16px;
+        border-left: 2px solid #e0e0e0;
+      }
+
+      .demo-controls {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .state-display {
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 16px;
+        min-height: 200px;
+      }
+
+      .state-badges {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+
+      .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        background-color: #f5f5f5;
+        font-size: 12px;
+        border: 1px solid #e0e0e0;
+      }
+
+      .badge.active {
+        background-color: #e3f2fd;
+        border-color: #2196f3;
+        color: #1976d2;
+      }
+
+      .loading-indicator {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 20px 0;
+      }
+
+      .value-display,
+      .error-display {
+        margin-top: 16px;
+      }
+
+      .error-display {
+        color: #d32f2f;
+      }
+
+      .error-display pre {
+        background-color: #ffebee;
+        padding: 8px;
+        border-radius: 4px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      mat-form-field {
+        width: 100%;
+        margin-bottom: 8px;
+      }
+
+      mat-checkbox {
+        margin-bottom: 8px;
+      }
+
+      mat-radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+    `,
+  ],
 })
 export class DemoAllInOneComponent {
   private readonly http = inject(HttpClient);
   private readonly fb = inject(FormBuilder);
-  
+  private readonly injector = inject(Injector);
+
   // Triggers for different functionalities
   manualTrigger$$ = new Subject<void>();
   requestTrigger$$ = new Subject<number>();
@@ -357,24 +346,20 @@ export class DemoAllInOneComponent {
     enableManualRefetch: [true],
     enableAutoRefetch: [false],
     autoRefetchInterval: [5000],
-    autoRefetchDuration: [30000]
+    autoRefetchDuration: [30000],
   });
 
   // Dynamic rxRequest based on configuration
-  dynamicRequest$ = combineLatest([
-    this.configForm.valueChanges.pipe(startWith(this.configForm.value))
-  ]).pipe(
+  dynamicRequest$ = combineLatest([this.configForm.valueChanges.pipe(startWith(this.configForm.value))]).pipe(
     map(([config]) => {
       const refetchStrategies = [];
-      
+
       if (config.enableManualRefetch) {
         refetchStrategies.push(withRefetchOnTrigger(this.manualTrigger$$));
       }
-      
+
       if (config.enableAutoRefetch) {
-        refetchStrategies.push(
-          withAutoRefetch(config.autoRefetchInterval, config.autoRefetchDuration)
-        );
+        refetchStrategies.push(withAutoRefetch(config.autoRefetchInterval, config.autoRefetchDuration));
       }
 
       const requestConfig = {
@@ -384,38 +369,39 @@ export class DemoAllInOneComponent {
         suspenseThresholdMs: config.suspenseThresholdMs,
         suspenseTimeMs: config.suspenseTimeMs,
         refetchStrategies,
-        errorMappingFn: config.useErrorMapping ? 
-          (error: HttpErrorResponse) => `Custom Error: ${error.message || error.toString()}` : 
-          undefined,
-        beforeHandleErrorFn: (error: any) => console.warn('Error occurred:', error)
+        errorMappingFn: config.useErrorMapping
+          ? (error: HttpErrorResponse) => `Custom Error: ${error.message || error.toString()}`
+          : undefined,
+        beforeHandleErrorFn: (error: any) => console.warn('Error occurred:', error),
+        injector: this.injector,
       };
 
       if (config.requestType === 'triggered') {
         return rxRequest({
           trigger: this.requestTrigger$$,
           requestFn: (counter: number) => this.makeApiCall(counter, config.apiDelay, config.simulateError),
-          config: requestConfig
+          config: requestConfig,
         });
       } else {
         return rxRequest({
           requestFn: () => this.makeApiCall(0, config.apiDelay, config.simulateError),
-          config: requestConfig
+          config: requestConfig,
         });
       }
     }),
-    switchMap(request => request.value$())
+    switchMap((request) => request.value$())
   );
 
   // Generated code based on current configuration
   generatedCode$ = this.configForm.valueChanges.pipe(
     startWith(this.configForm.value),
-    map(config => this.generateCode(config))
+    map((config) => this.generateCode(config))
   );
 
   private makeApiCall(counter: number, delay: number, simulateError: boolean) {
     const baseUrl = 'https://jsonplaceholder.typicode.com/todos';
     const url = counter > 0 ? `${baseUrl}?_start=${counter * 5}&_limit=10` : `${baseUrl}?_limit=10`;
-    
+
     return timer(delay).pipe(
       switchMap(() => {
         if (simulateError && Math.random() > 0.7) {
@@ -428,42 +414,42 @@ export class DemoAllInOneComponent {
 
   private generateCode(config: any): string {
     const refetchStrategies = [];
-    
+
     if (config.enableManualRefetch) {
       refetchStrategies.push('withRefetchOnTrigger(this.manualTrigger$$)');
     }
-    
+
     if (config.enableAutoRefetch) {
-      refetchStrategies.push(
-        `withAutoRefetch(${config.autoRefetchInterval}, ${config.autoRefetchDuration})`
-      );
+      refetchStrategies.push(`withAutoRefetch(${config.autoRefetchInterval}, ${config.autoRefetchDuration})`);
     }
 
     const configOptions = [];
-    
+
     if (config.requestType === 'triggered') {
       configOptions.push(`operator: '${config.operator}'`);
     }
-    
+
     configOptions.push(`keepValueOnRefresh: ${config.keepValueOnRefresh}`);
     configOptions.push(`keepErrorOnRefresh: ${config.keepErrorOnRefresh}`);
     configOptions.push(`suspenseThresholdMs: ${config.suspenseThresholdMs}`);
     configOptions.push(`suspenseTimeMs: ${config.suspenseTimeMs}`);
-    
+
     if (refetchStrategies.length > 0) {
       configOptions.push(`refetchStrategies: [${refetchStrategies.join(', ')}]`);
     }
-    
+
     if (config.useErrorMapping) {
       configOptions.push('errorMappingFn: (error: HttpErrorResponse) => `Custom Error: ${error.message}`');
     }
 
-    const requestFnContent = config.requestType === 'triggered' 
-      ? `(counter: number) => this.http.get<Todo[]>(\`https://jsonplaceholder.typicode.com/todos?_start=\${counter * 5}&_limit=10\`)`
-      : `() => this.http.get<Todo[]>('https://jsonplaceholder.typicode.com/todos?_limit=10')`;
+    const requestFnContent =
+      config.requestType === 'triggered'
+        ? `(counter: number) => this.http.get<Todo[]>(\`https://jsonplaceholder.typicode.com/todos?_start=\${counter * 5}&_limit=10\`)`
+        : `() => this.http.get<Todo[]>('https://jsonplaceholder.typicode.com/todos?_limit=10')`;
 
-    const baseCode = config.requestType === 'triggered' 
-      ? `// Trigger for requests
+    const baseCode =
+      config.requestType === 'triggered'
+        ? `// Trigger for requests
 readonly requestTrigger$$ = new Subject<number>();
 let requestCounter = 1;
 
@@ -481,7 +467,7 @@ request = rxRequest({
 // Usage:
 // Trigger new request: this.requestTrigger$$.next(this.requestCounter++);
 ${config.enableManualRefetch ? '// Manual refresh: this.manualTrigger$$.next();' : ''}`
-      : `// Manual refresh trigger (if enabled)  
+        : `// Manual refresh trigger (if enabled)
 ${config.enableManualRefetch ? 'readonly manualTrigger$$ = new Subject<void>();' : '// No manual trigger'}
 
 request = rxRequest({
@@ -492,7 +478,11 @@ request = rxRequest({
 });
 
 // Usage:
-${config.enableManualRefetch ? '// Manual refresh: this.manualTrigger$$.next();' : '// Call request.refresh() to manually refresh'}`;
+${
+  config.enableManualRefetch
+    ? '// Manual refresh: this.manualTrigger$$.next();'
+    : '// Call request.refresh() to manually refresh'
+}`;
 
     return baseCode;
   }
@@ -516,7 +506,7 @@ ${config.enableManualRefetch ? '// Manual refresh: this.manualTrigger$$.next();'
       enableManualRefetch: true,
       enableAutoRefetch: false,
       autoRefetchInterval: 5000,
-      autoRefetchDuration: 30000
+      autoRefetchDuration: 30000,
     });
   }
 }
