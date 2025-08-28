@@ -30,7 +30,7 @@ import {AsyncPipe, JsonPipe} from "@angular/common";
     ]
 })
 export class AppComponent {
-  title = 'demo-rx-stateful';
+  title = 'demo';
   refresh$$ = new Subject<void>();
 
   page$$ = new BehaviorSubject<number>(1);
