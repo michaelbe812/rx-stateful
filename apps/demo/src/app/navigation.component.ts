@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, NgIf } from '@angular/common';
 import { filter, map, shareReplay } from 'rxjs';
 
 import {appRoutes} from "./app.routes";
@@ -19,7 +19,8 @@ import {appRoutes} from "./app.routes";
         MatIconModule,
         MatButtonModule,
         MatToolbarModule,
-        AsyncPipe
+        AsyncPipe,
+        NgIf
     ],
     selector: 'navigation',
     template: `
