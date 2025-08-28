@@ -4,7 +4,6 @@ import { appRoutes } from './app.routes';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from "@angular/common/http";
 import { HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
-import {provideRxStatefulConfig} from "../../../../libs/rx-stateful/src";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -16,10 +15,6 @@ export const appConfig: ApplicationConfig = {
       useValue: {
         fullLibraryLoader: () => import('highlight.js')
       }
-    },
-    // provideRxStatefulConfig({
-    //   suspenseTimeMs: 5000,
-    //   suspenseThresholdMs: 8000,
-    // })
+    }
   ],
 };
