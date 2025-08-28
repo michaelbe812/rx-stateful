@@ -1,22 +1,22 @@
 {
-  "name": "demo-rx-stateful",
+  "name": "demo",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "prefix": "demo",
-  "sourceRoot": "apps/demo-rx-stateful/src",
+  "sourceRoot": "apps/demo/src",
   "tags": [],
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/demo-rx-stateful",
-        "index": "apps/demo-rx-stateful/src/index.html",
-        "main": "apps/demo-rx-stateful/src/main.ts",
+        "outputPath": "dist/apps/demo",
+        "index": "apps/demo/src/index.html",
+        "main": "apps/demo/src/main.ts",
         "polyfills": ["zone.js"],
-        "tsConfig": "apps/demo-rx-stateful/tsconfig.app.json",
-        "assets": ["apps/demo-rx-stateful/src/favicon.ico", "apps/demo-rx-stateful/src/assets"],
-        "styles": ["@angular/material/prebuilt-themes/indigo-pink.css", "apps/demo-rx-stateful/src/styles.scss"],
+        "tsConfig": "apps/demo/tsconfig.app.json",
+        "assets": ["apps/demo/src/favicon.ico", "apps/demo/src/assets"],
+        "styles": ["@angular/material/prebuilt-themes/indigo-pink.css", "apps/demo/src/styles.scss"],
         "scripts": []
       },
       "configurations": {
@@ -50,10 +50,10 @@
       "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
         "production": {
-          "buildTarget": "demo-rx-stateful:build:production"
+          "buildTarget": "demo:build:production"
         },
         "development": {
-          "buildTarget": "demo-rx-stateful:build:development"
+          "buildTarget": "demo:build:development"
         }
       },
       "defaultConfiguration": "development",
@@ -62,13 +62,13 @@
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "buildTarget": "demo-rx-stateful:build"
+        "buildTarget": "demo:build"
       }
     },
     "serve-static": {
       "executor": "@nx/web:file-server",
       "options": {
-        "buildTarget": "demo-rx-stateful:build"
+        "buildTarget": "demo:build"
       }
     }
   }

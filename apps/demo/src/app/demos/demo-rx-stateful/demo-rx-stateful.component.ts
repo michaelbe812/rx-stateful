@@ -9,7 +9,7 @@ import {rxRequest, withRefetchOnTrigger} from "@angular-kit/rx-stateful";
 import {MatButtonModule} from "@angular/material/button";
 
 @Component({
-  selector: 'angular-kit-demo-rx-stateful',
+  selector: 'angular-kit-demo',
   standalone: true,
   imports: [CommonModule, MatButtonModule],
   template: `

@@ -25,7 +25,7 @@ import {appRoutes} from "./app.routes";
 })
 export class NavigationComponent {
 
-  title = 'demo-rx-stateful';
+  title = 'demo';
   links = appRoutes
 
   activeLink = this.links[0];
