@@ -8,22 +8,20 @@ import { BehaviorSubject, map, of, scan, Subject, timer } from 'rxjs';
   imports: [RouterModule, NavigationComponent],
   selector: 'demo-root',
   template: `
-    <h1>RxStateful Demo</h1>
-    <p>Select one of the demos from the tabs below</p>
     <navigation />
 
-    <!--    <button (click)="refresh$$.next()">Refresh</button>-->
-    <!--    <button (click)="page$$.next(1)">next page</button>-->
-    <!--    {{ req.value$() | async | json }}-->
-    <!--    <br>-->
-    <!--    <hr>-->
-    <!--    {{ req2.value$() | async | json }}-->
+<!--    <button (click)="refresh$$.next()">Refresh</button>-->
+<!--    <button (click)="page$$.next(1)">next page</button>-->
+<!--    {{ req.value$() | async | json }}-->
+<!--    <br>-->
+<!--    <hr>-->
+<!--    {{ req2.value$() | async | json }}-->
   `,
-  styles: [
-    `
+    styles: [
+        `
       :host {
         display: block;
-        padding: 32px 64px 32px 64px;
+        height: 100vh;
       }
     `,
   ],
