@@ -1,11 +1,9 @@
 import { Route } from '@angular/router';
-import {DemoPaginationComponent} from "./demos/demo-pagination.component";
-import {DemoBasicUsageComponent} from "./demos/demo-basic-usage.component";
-import {AllUseCasesComponent} from "./all-use-cases/all-use-cases.component";
-import {DemoAllInOneComponent} from "./demos/demo-all-in-one.component";
-import {DemoAllInOneTabbedComponent} from "./demos/demo-all-in-one-tabbed.component";
-import {DemoAllInOneSidebarComponent} from "./demos/demo-all-in-one-sidebar.component";
-import {DemoAllInOneWizardComponent} from "./demos/demo-all-in-one-wizard.component";
+import { DemoPaginationComponent } from './demos/demo-pagination.component';
+import { DemoBasicUsageComponent } from './demos/demo-basic-usage.component';
+import { AllUseCasesComponent } from './all-use-cases/all-use-cases.component';
+import { DemoAllInOneComponent } from './demos/demo-all-in-one.component';
+import { DemoAllInOneTabbedComponent } from './demos/demo-all-in-one-tabbed.component';
 
 export const appRoutes: Route[] = [
   {
@@ -32,15 +30,5 @@ export const appRoutes: Route[] = [
     title: 'all-in-one tabbed',
     path: 'all-in-one-tabbed',
     component: DemoAllInOneTabbedComponent,
-  },
-  {
-    title: 'all-in-one sidebar',
-    path: 'all-in-one-sidebar',
-    component: DemoAllInOneSidebarComponent,
-  },
-  {
-    title: 'all-in-one wizard',
-    path: 'all-in-one-wizard',
-    component: DemoAllInOneWizardComponent,
   },
 ];
