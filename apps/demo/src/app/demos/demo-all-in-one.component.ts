@@ -12,7 +12,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatListModule } from '@angular/material/list';
 import { HighlightModule } from 'ngx-highlightjs';
-import { combineLatest, map, startWith, Subject, switchMap, throwError, timer } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, scan, startWith, Subject, switchMap, throwError, timer } from 'rxjs';
 import { rxRequest, withAutoRefetch, withRefetchOnTrigger } from '@angular-kit/rx-stateful';
 import { Todo } from '../types';
 import { TodoItemComponent } from './todo-item.component';
@@ -100,6 +100,20 @@ import { TodoItemComponent } from './todo-item.component';
               <mat-checkbox formControlName="useErrorMapping">Use Custom Error Mapping</mat-checkbox>
             </div>
 
+            <!-- Pagination -->
+            <div class="form-section">
+              <h3>Pagination</h3>
+              <mat-checkbox formControlName="enablePagination">Enable Pagination</mat-checkbox>
+              @if (configForm.get('enablePagination')?.value) {
+              <div class="nested-config">
+                <mat-form-field>
+                  <mat-label>Items per page</mat-label>
+                  <input matInput type="number" formControlName="itemsPerPage" />
+                </mat-form-field>
+              </div>
+              }
+            </div>
+
             <!-- Refetch Strategies -->
             <div class="form-section">
               <h3>Refetch Strategies</h3>
@@ -131,9 +145,14 @@ import { TodoItemComponent } from './todo-item.component';
         <mat-card-content>
           <!-- Controls -->
           <div class="demo-controls">
+            @if (configForm.get('enablePagination')?.value) {
+            <button mat-raised-button (click)="previousPage()" [disabled]="currentPage === 0">Previous Page</button>
+            <button mat-raised-button (click)="nextPage()">Next Page</button>
+            <span class="page-indicator">Page {{ currentPage + 1 }}</span>
+            }
             @if (configForm.get('enableManualRefetch')?.value) {
             <button mat-raised-button color="primary" (click)="manualTrigger$$.next()">Manual Refresh</button>
-            } @if (configForm.get('requestType')?.value === 'triggered') {
+            } @if (configForm.get('requestType')?.value === 'triggered' && !configForm.get('enablePagination')?.value) {
             <button mat-raised-button color="accent" (click)="triggerRequest()">
               Trigger Request (#{{ requestCounter }})
             </button>
@@ -319,6 +338,11 @@ import { TodoItemComponent } from './todo-item.component';
         flex-direction: column;
         gap: 8px;
       }
+
+      .page-indicator {
+        padding: 8px 16px;
+        font-weight: 500;
+      }
     `,
   ],
 })
@@ -331,6 +355,17 @@ export class DemoAllInOneComponent {
   manualTrigger$$ = new Subject<void>();
   requestTrigger$$ = new Subject<number>();
   requestCounter = 1;
+  
+  // Pagination
+  page$$ = new BehaviorSubject(0);
+  currentPage = 0;
+  page$ = this.page$$.pipe(
+    scan((acc, curr) => {
+      const newPage = Math.max(0, acc + curr);
+      this.currentPage = newPage;
+      return newPage;
+    }, 0)
+  );
 
   // Configuration form
   configForm: FormGroup = this.fb.group({
@@ -347,6 +382,8 @@ export class DemoAllInOneComponent {
     enableAutoRefetch: [false],
     autoRefetchInterval: [5000],
     autoRefetchDuration: [30000],
+    enablePagination: [false],
+    itemsPerPage: [5],
   });
 
   // Dynamic rxRequest based on configuration
@@ -376,7 +413,13 @@ export class DemoAllInOneComponent {
         injector: this.injector,
       };
 
-      if (config.requestType === 'triggered') {
+      if (config.enablePagination) {
+        return rxRequest({
+          trigger: this.page$,
+          requestFn: (page: number) => this.makeApiCallWithPagination(page, config.itemsPerPage, config.apiDelay, config.simulateError),
+          config: requestConfig,
+        });
+      } else if (config.requestType === 'triggered') {
         return rxRequest({
           trigger: this.requestTrigger$$,
           requestFn: (counter: number) => this.makeApiCall(counter, config.apiDelay, config.simulateError),
@@ -412,6 +455,20 @@ export class DemoAllInOneComponent {
     );
   }
 
+  private makeApiCallWithPagination(page: number, itemsPerPage: number, delay: number, simulateError: boolean) {
+    const baseUrl = 'https://jsonplaceholder.typicode.com/todos';
+    const url = `${baseUrl}?_start=${page * itemsPerPage}&_limit=${itemsPerPage}`;
+
+    return timer(delay).pipe(
+      switchMap(() => {
+        if (simulateError && Math.random() > 0.7) {
+          return throwError(() => new Error(`Simulated API error for page ${page}`));
+        }
+        return this.http.get<Todo[]>(url);
+      })
+    );
+  }
+
   private generateCode(config: any): string {
     const refetchStrategies = [];
 
@@ -425,7 +482,7 @@ export class DemoAllInOneComponent {
 
     const configOptions = [];
 
-    if (config.requestType === 'triggered') {
+    if (config.enablePagination || config.requestType === 'triggered') {
       configOptions.push(`operator: '${config.operator}'`);
     }
 
@@ -442,19 +499,42 @@ export class DemoAllInOneComponent {
       configOptions.push('errorMappingFn: (error: HttpErrorResponse) => `Custom Error: ${error.message}`');
     }
 
+    if (config.enablePagination) {
+      return `// Pagination state
+readonly page$$ = new BehaviorSubject(0);
+readonly page$ = this.page$$.pipe(
+  scan((acc, curr) => Math.max(0, acc + curr), 0)
+);
+
+// Manual refresh trigger (if enabled)
+${config.enableManualRefetch ? 'readonly manualTrigger$$ = new Subject<void>();' : '// No manual trigger'}
+
+request = rxRequest({
+  trigger: this.page$,
+  requestFn: (page: number) => this.http.get<Todo[]>(\`https://jsonplaceholder.typicode.com/todos?_start=\${page * ${config.itemsPerPage}}&_limit=${config.itemsPerPage}\`),
+  config: {
+    ${configOptions.join(',\\n    ')}
+  }
+});
+
+// Usage:
+// Previous page: this.page$$.next(-1);
+// Next page: this.page$$.next(1);
+${config.enableManualRefetch ? '// Manual refresh: this.manualTrigger$$.next();' : ''}`;
+    }
+
     const requestFnContent =
       config.requestType === 'triggered'
         ? `(counter: number) => this.http.get<Todo[]>(\`https://jsonplaceholder.typicode.com/todos?_start=\${counter * 5}&_limit=10\`)`
         : `() => this.http.get<Todo[]>('https://jsonplaceholder.typicode.com/todos?_limit=10')`;
 
-    const baseCode =
-      config.requestType === 'triggered'
-        ? `// Trigger for requests
+    return config.requestType === 'triggered'
+      ? `// Trigger for requests
 readonly requestTrigger$$ = new Subject<number>();
 let requestCounter = 1;
 
 // Manual refresh trigger (if enabled)
-${config.enableManualRefetch ? 'readonly manualTrigger$$ = new Subject<void>();' : '// No manual trigger'}
+${config.enableManualRefresh ? 'readonly manualTrigger$$ = new Subject<void>();' : '// No manual trigger'}
 
 request = rxRequest({
   trigger: this.requestTrigger$$,
@@ -466,8 +546,8 @@ request = rxRequest({
 
 // Usage:
 // Trigger new request: this.requestTrigger$$.next(this.requestCounter++);
-${config.enableManualRefetch ? '// Manual refresh: this.manualTrigger$$.next();' : ''}`
-        : `// Manual refresh trigger (if enabled)
+${config.enableManualRefresh ? '// Manual refresh: this.manualTrigger$$.next();' : ''}`
+      : `// Manual refresh trigger (if enabled)
 ${config.enableManualRefetch ? 'readonly manualTrigger$$ = new Subject<void>();' : '// No manual trigger'}
 
 request = rxRequest({
@@ -483,16 +563,27 @@ ${
     ? '// Manual refresh: this.manualTrigger$$.next();'
     : '// Call request.refresh() to manually refresh'
 }`;
-
-    return baseCode;
   }
 
   triggerRequest() {
     this.requestTrigger$$.next(this.requestCounter++);
   }
 
+  previousPage() {
+    this.page$$.next(-1);
+  }
+
+  nextPage() {
+    this.page$$.next(1);
+  }
+
   reset() {
     this.requestCounter = 1;
+    this.currentPage = 0;
+    this.page$$ = new BehaviorSubject(0);
+    this.page$ = this.page$$.pipe(
+      scan((acc, curr) => Math.max(0, acc + curr), 0)
+    );
     this.configForm.reset({
       requestType: 'simple',
       operator: 'switch',
@@ -507,6 +598,8 @@ ${
       enableAutoRefetch: false,
       autoRefetchInterval: 5000,
       autoRefetchDuration: 30000,
+      enablePagination: false,
+      itemsPerPage: 5,
     });
   }
 }
