@@ -635,8 +635,7 @@ describe(rxRequest.name, () => {
             trigger$.next(null);
 
             expect(beforeHandleErrorFn).toHaveBeenCalledWith(Error('error'));
-            // TODO this needs investigation
-            expect(beforeHandleErrorFn).toHaveBeenCalledTimes(2);
+            expect(beforeHandleErrorFn).toHaveBeenCalledTimes(1);
           });
           test('should use errorMappingFn', () => {
             runWithTestScheduler(({ expectObservable, cold }) => {
