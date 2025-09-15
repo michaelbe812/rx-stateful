@@ -1,4 +1,15 @@
-import { combineLatest, filter, map, merge, Observable, startWith, switchMap, takeUntil, timer } from 'rxjs';
+import {
+  combineLatest,
+  filter,
+  map,
+  merge,
+  Observable,
+  startWith,
+  switchMap,
+  takeUntil,
+  timer,
+  withLatestFrom,
+} from 'rxjs';
 import { InternalRxState } from '../types/types';
 
 /**
@@ -49,12 +60,7 @@ export function pairLoadingWithResponse<T, E>(
 ): Observable<Partial<InternalRxState<T, E>>> {
   return loadingIndicator$.pipe(
     withLatestFrom(response$),
-    filter(
-      ([loading, value]) => (!loading && value.context !== 'suspense') || loading
-    ),
+    filter(([loading, value]) => (!loading && value.context !== 'suspense') || loading),
     map(([loading, value]) => value)
   );
 }
-
-// Import withLatestFrom here to avoid circular dependency
-import { withLatestFrom } from 'rxjs';
