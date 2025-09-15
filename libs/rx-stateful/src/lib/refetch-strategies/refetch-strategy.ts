@@ -23,4 +23,3 @@ export type AutoRefetchStrategy = {
 export function refetchFnFactory(trigger: Observable<any> | Subject<any>){
     return () => trigger
 }
-export function refetchStrategyFactory(){}

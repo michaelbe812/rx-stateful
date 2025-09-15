@@ -1,7 +1,6 @@
 import {
   BehaviorSubject,
   catchError,
-  combineLatest,
   distinctUntilChanged,
   filter,
   isObservable,
@@ -11,16 +10,11 @@ import {
   Observable,
   of,
   race,
-  ReplaySubject,
   scan,
-  share,
   startWith,
   Subject,
   switchMap,
-  takeUntil,
   tap,
-  timer,
-  withLatestFrom,
   OperatorFunction,
 } from 'rxjs';
 import { InternalRxState, RxStatefulConfig, RxStatefulSourceTriggerConfig, RxStatefulWithError } from './types/types';
@@ -31,6 +25,7 @@ import { defaultAccumulationFn } from './types/accumulation-fn';
 import { mergeRefetchStrategies } from './refetch-strategies/merge-refetch-strategies';
 import { isFunctionGuard, isSourceTriggerConfigGuard } from './types/guards';
 import { applyFlatteningOperator } from './util/apply-flattening-operator';
+import { calcStartValueForRefresh } from './util/calc-start-value-for-refresh';
 
 /**
  * @internal
@@ -38,7 +33,7 @@ import { applyFlatteningOperator } from './util/apply-flattening-operator';
  * helper function to create the rxStateful$ observable
  */
 export function createState$<T, A, E>(
-  sourceOrSourceFn$: Observable<T> | ((arg: A) => Observable<T>),
+  sourceOrFactory: Observable<T> | ((arg: A) => Observable<T>),
   mergedConfig: RxStatefulConfig<T, E> | RxStatefulSourceTriggerConfig<T, A, E>
 ) {
   const accumulationFn = mergedConfig.accumulationFn ?? defaultAccumulationFn;
@@ -47,10 +42,10 @@ export function createState$<T, A, E>(
   const suspenseThreshold: number = mergedConfig.suspenseThresholdMs!;
   const suspenseTime: number = mergedConfig.suspenseTimeMs!;
 
-  // case 1: SourceTriggerConfig given --> sourceOrSourceFn$ is function
-  if (isFunctionGuard(sourceOrSourceFn$) && isSourceTriggerConfigGuard(mergedConfig)) {
+  // case 1: SourceTriggerConfig given --> sourceOrFactory is function
+  if (isFunctionGuard(sourceOrFactory) && isSourceTriggerConfigGuard(mergedConfig)) {
     /**
-     * we need to cache the argument which is passed to sourceOrSourceFn$ because
+     * we need to cache the argument which is passed to sourceOrFactory because
      * we want to use it when we refresh the value
      */
     let cachedArgument: A | undefined = undefined;
@@ -64,13 +59,13 @@ export function createState$<T, A, E>(
       applyFlatteningOperator(
         (mergedConfig as RxStatefulSourceTriggerConfig<T, A, E>)?.sourceTriggerConfig?.operator,
         (arg) =>
-          sourceOrSourceFn$(arg).pipe(
+          sourceOrFactory(arg).pipe(
             map((v) => mapToValue(v)),
             deriveInitialValue<T, E>(mergedConfig)
           )
       ),
       shareWithReplay(),
-      catchError((error: E) => handleError<T, E>(error, mergedConfig, error$$))
+      catchError((error: unknown) => handleError<T, E>(error, mergedConfig, error$$))
     );
 
     const refreshTrigger$ = merge(...mergeRefetchStrategies(mergedConfig?.refetchStrategies));
@@ -84,38 +79,25 @@ export function createState$<T, A, E>(
        * This can happen if refresh is triggered before the sourceTrigger has emitted.
        */
       switchMap(() =>
-        cachedArgument !== undefined 
-          ? sourceOrSourceFn$(cachedArgument).pipe(
+        cachedArgument !== undefined
+          ? sourceOrFactory(cachedArgument).pipe(
           map((v) => mapToValue(v)),
           deriveInitialValue<T, E>(mergedConfig),
-          catchError((error: E) => handleError<T, E>(error, mergedConfig, error$$))
+          catchError((error: unknown) => handleError<T, E>(error, mergedConfig, error$$))
           )
           : NEVER
       ),
       shareWithReplay()
     );
 
-    // Create loading indicators using the helper function
-    const s1 = createLoadingIndicator(refreshTrigger$, refreshedValue$, suspenseThreshold, suspenseTime);
-    const s2 = createLoadingIndicator(sourceTrigger$, valueFromSourceTrigger$, suspenseThreshold, suspenseTime);
+    // Apply non-flicker gating using helper
+    const sourceTriggerGated$ = nonFlickerGate(sourceTrigger$, valueFromSourceTrigger$, suspenseThreshold, suspenseTime);
+    const refreshGated$ = nonFlickerGate(refreshTrigger$, refreshedValue$, suspenseThreshold, suspenseTime);
 
-    // Correct Pairs using helper function
-    const pair1$ = pairLoadingWithResponse(s2, valueFromSourceTrigger$);
-    const pair2$ = pairLoadingWithResponse(s1, refreshedValue$);
-
-    const finalResult$ = merge(
-      race(pair1$, valueFromSourceTrigger$.pipe(filter((v) => (v as InternalRxState<T, E>)?.context !== 'suspense'))),
-      race(pair2$, refreshedValue$.pipe(filter((v) => (v as InternalRxState<T, E>)?.context !== 'suspense')))
-    );
+    const finalResult$ = merge(sourceTriggerGated$, refreshGated$);
 
     const result$ = merge(finalResult$, error$$).pipe(
-      scan(accumulationFn, {
-        isLoading: false,
-        isRefreshing: false,
-        value: undefined,
-        error: undefined,
-        context: 'suspense',
-      } as any),
+      scan(accumulationFn, createInitialState<T, E>()),
       distinctUntilChanged(),
       shareWithReplay(),
       _handleSyncValue()
@@ -124,11 +106,11 @@ export function createState$<T, A, E>(
     return result$;
   }
 
-  // case 2: no SourceTriggerConfig given --> sourceOrSourceFn$ is Observable
-  if (isObservable(sourceOrSourceFn$)) {
-    const sharedSource$ = sourceOrSourceFn$.pipe(
+  // case 2: no SourceTriggerConfig given --> sourceOrFactory is Observable
+  if (isObservable(sourceOrFactory)) {
+    const sharedSource$ = sourceOrFactory.pipe(
       shareWithReplay(),
-      catchError((error: E) => handleError<T, E>(error, mergedConfig, error$$))
+      catchError((error: unknown) => handleError<T, E>(error, mergedConfig, error$$))
     );
 
     const refresh$ = merge(new BehaviorSubject(null), ...mergeRefetchStrategies(mergedConfig?.refetchStrategies));
@@ -143,22 +125,11 @@ export function createState$<T, A, E>(
       shareWithReplay()
     ) as Observable<Partial<InternalRxState<T, E>>>;
 
-    // Create loading indicator using helper function
-    const showLoadingIndicator$ = createLoadingIndicator(refresh$, refreshedRequest$, suspenseThreshold, suspenseTime);
-
-    // Pair loading with response using helper function
-    const pair$ = pairLoadingWithResponse(showLoadingIndicator$, refreshedRequest$);
-    // We need to do this because if the response is coming immediatly/before the threshold is reached we would not get any value
-    const result$ = race(pair$, refreshedRequest$.pipe(filter((v) => v.context !== 'suspense')));
+    // Apply non-flicker gating using helper
+    const result$ = nonFlickerGate(refresh$, refreshedRequest$, suspenseThreshold, suspenseTime);
 
     return merge(result$, error$$).pipe(
-      scan(accumulationFn, {
-        isLoading: false,
-        isRefreshing: false,
-        value: undefined,
-        error: undefined,
-        context: 'suspense',
-      } as any),
+      scan(accumulationFn, createInitialState<T, E>()),
       distinctUntilChanged(),
       shareWithReplay(),
       _handleSyncValue()
@@ -170,39 +141,44 @@ export function createState$<T, A, E>(
 }
 
 function deriveInitialValue<T, E>(mergedConfig: RxStatefulConfig<T, E>): OperatorFunction<any, Partial<InternalRxState<T, E>>> {
-  // TODO for first emission set isRefreshing to false
-  let value: Partial<InternalRxState<T, E>> = {
-    isLoading: true,
-    isRefreshing: true,
-    context: 'suspense',
-  };
-  if (!mergedConfig.keepValueOnRefresh) {
-    value = {
-      ...value,
-      value: null,
-    };
-  }
-  if (!mergedConfig.keepErrorOnRefresh) {
-    value = {
-      ...value,
-      error: undefined,
-    };
-  }
-
-  return startWith(value);
+  return startWith(calcStartValueForRefresh(mergedConfig));
 }
 
 function handleError<T, E>(
-  error: E,
+  error: unknown,
   mergedConfig: RxStatefulConfig<T, E>,
   error$$: Subject<RxStatefulWithError<T, E>>
 ) {
-  mergedConfig?.beforeHandleErrorFn?.(error);
-  const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => error as any);
+  mergedConfig?.beforeHandleErrorFn?.(error as E);
+  const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: unknown) => error as E);
   error$$.next({ error: errorMappingFn(error), context: 'error', isLoading: false, isRefreshing: false, value: null });
   return NEVER;
 }
 
 function mapToValue<T, E>(value: T): Partial<InternalRxState<T, E>> {
   return { value, isLoading: false, isRefreshing: false, context: 'next', error: undefined };
+}
+
+function createInitialState<T, E>(): InternalRxState<T, E> {
+  return {
+    isLoading: false,
+    isRefreshing: false,
+    value: undefined,
+    error: undefined,
+    context: 'suspense',
+  } as InternalRxState<T, E>;
+}
+
+/**
+ * Helper function to apply non-flicker gating for loading indicators
+ */
+function nonFlickerGate<T, E>(
+  trigger$: Observable<any>,
+  response$: Observable<Partial<InternalRxState<T, E>>>,
+  suspenseThreshold: number,
+  suspenseTime: number
+): Observable<Partial<InternalRxState<T, E>>> {
+  const loadingIndicator$ = createLoadingIndicator(trigger$, response$, suspenseThreshold, suspenseTime);
+  const pair$ = pairLoadingWithResponse(loadingIndicator$, response$);
+  return race(pair$, response$.pipe(filter((v) => v.context !== 'suspense')));
 }

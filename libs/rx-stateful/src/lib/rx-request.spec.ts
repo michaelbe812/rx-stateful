@@ -45,6 +45,68 @@ describe(rxRequest.name, () => {
           );
         });
       });
+
+      test('should correctly handle falsy values (0, false, empty string)', () => {
+        runWithTestScheduler(({ expectObservable }) => {
+          const source0$ = rxRequest({
+            requestFn: () => of(0),
+            config: defaultConfig,
+          });
+          const sourceFalse$ = rxRequest({
+            requestFn: () => of(false),
+            config: defaultConfig,
+          });
+          const sourceEmpty$ = rxRequest({
+            requestFn: () => of(''),
+            config: defaultConfig,
+          });
+
+          const expected = 's';
+
+          expectObservable(source0$.value$()).toBe(
+            expected,
+            marbelize({
+              s: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 0,
+                hasValue: true,
+                isSuspense: false,
+              },
+            })
+          );
+
+          expectObservable(sourceFalse$.value$()).toBe(
+            expected,
+            marbelize({
+              s: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: false,
+                hasValue: true,
+                isSuspense: false,
+              },
+            })
+          );
+
+          expectObservable(sourceEmpty$.value$()).toBe(
+            expected,
+            marbelize({
+              s: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: '',
+                hasValue: true,
+                isSuspense: false,
+              },
+            })
+          );
+        });
+      });
+
       // TODO
       // test('underlying source$ should be multicasted', () => {
       //

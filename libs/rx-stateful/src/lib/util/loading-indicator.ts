@@ -1,4 +1,4 @@
-import { combineLatest, filter, map, merge, Observable, startWith, switchMap, takeUntil, timer } from 'rxjs';
+import { combineLatest, filter, map, merge, Observable, startWith, switchMap, takeUntil, timer, withLatestFrom } from 'rxjs';
 import { InternalRxState } from '../types/types';
 
 /**
@@ -55,6 +55,3 @@ export function pairLoadingWithResponse<T, E>(
     map(([loading, value]) => value)
   );
 }
-
-// Import withLatestFrom here to avoid circular dependency
-import { withLatestFrom } from 'rxjs';

@@ -31,13 +31,39 @@ export type RxStatefulLoader<T, A, E> = {
   };
 };
 
+export type RxStatefulLoaderNoTrigger<T, E> = {
+  /**
+   * Function to create the request observable.
+   */
+  requestFn: () => Observable<T>;
+  /**
+   * Configuration for the stateful request
+   */
+  config?: RxStatefulConfig<T, E>;
+};
+
 /**
  * @publicApi
  *
  * @description
- * Function to create a stateful request object which can be used to trigger a request and handle the state of the request.
- * The requestFn is called with the trigger value if a trigger is provided.
- * The requestFn is called without a value if no trigger is provided.
+ * Function to create a stateful request object without a trigger.
+ * The requestFn is called without arguments.
+ *
+ * @example
+ * const rxRequest = rxRequest({
+ *  requestFn: () => httpClient.get('https://my-api.com'),
+ *  config: {keepValueOnRefresh: true}
+ * })
+ * @param loaderOptions
+ */
+export function rxRequest<T, E = unknown>(loaderOptions: RxStatefulLoaderNoTrigger<T, E>): RxRequest<T, E>;
+
+/**
+ * @publicApi
+ *
+ * @description
+ * Function to create a stateful request object with a trigger.
+ * The requestFn is called with the trigger value.
  *
  * @example
  * const sourceTrigger$$ = new Subject<string>()
@@ -48,8 +74,11 @@ export type RxStatefulLoader<T, A, E> = {
  * })
  * @param loaderOptions
  */
-export function rxRequest<T, A, E = unknown>(loaderOptions: RxStatefulLoader<T, A, E>): RxRequest<T, E> {
-  const { requestFn, trigger, config } = loaderOptions;
+export function rxRequest<T, A, E = unknown>(loaderOptions: RxStatefulLoader<T, A, E>): RxRequest<T, E>;
+
+export function rxRequest<T, A, E = unknown>(loaderOptions: RxStatefulLoader<T, A, E> | RxStatefulLoaderNoTrigger<T, E>): RxRequest<T, E> {
+  const { requestFn, config } = loaderOptions;
+  const trigger = 'trigger' in loaderOptions ? loaderOptions.trigger : undefined;
 
   !config?.injector && assertInInjectionContext(rxRequest);
   const assertedInjector = config?.injector ?? inject(Injector);
@@ -85,11 +114,14 @@ export function rxRequest<T, A, E = unknown>(loaderOptions: RxStatefulLoader<T, 
     if (trigger) {
       (mergedConfig as RxStatefulSourceTriggerConfig<T, A, E>).sourceTriggerConfig = {
         trigger,
-        operator: config?.operator ?? 'switch',
+        operator: (config as any)?.operator ?? 'switch',
       };
     }
 
-    const state$ = createState$<T, A, E>(trigger ? requestFn : requestFn(undefined as A), mergedConfig);
+    const state$ = createState$<T, A, E>(
+      trigger ? requestFn : (requestFn as () => Observable<T>)(),
+      mergedConfig
+    );
     const rxStateful = createRxStateful<T, E>(state$, mergedConfig);
 
     return {

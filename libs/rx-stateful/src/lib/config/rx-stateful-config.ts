@@ -8,10 +8,10 @@ export type Config<T, E> = Pick<
 > & {
   autoRefetch?: RefetchStrategy;
 };
-export const RX_STATEFUL_CONFIG = <T,E>() => new InjectionToken<Config<T, E>>('RX_STATEFUL_CONFIG');
+export const RX_STATEFUL_CONFIG = new InjectionToken<Config<any, any>>('RX_STATEFUL_CONFIG');
 
 export function provideRxStatefulConfig<T, E>(config: Partial<Config<T, E>>) {
-  return makeEnvironmentProviders([{ provide: RX_STATEFUL_CONFIG<T, E>, useValue: config }]);
+  return makeEnvironmentProviders([{ provide: RX_STATEFUL_CONFIG, useValue: config }]);
 }
 
 

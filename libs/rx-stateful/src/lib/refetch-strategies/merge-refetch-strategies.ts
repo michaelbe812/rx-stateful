@@ -1,5 +1,5 @@
 import {RefetchStrategy} from "./refetch-strategy";
-import {BehaviorSubject, Observable, pipe, skip} from "rxjs";
+import {Observable} from "rxjs";
 
 
 export function mergeRefetchStrategies(refetchStrategies: RefetchStrategy[] | RefetchStrategy | undefined): Observable<any>[] {
@@ -7,9 +7,13 @@ export function mergeRefetchStrategies(refetchStrategies: RefetchStrategy[] | Re
         return [];
     }
     const strategies: RefetchStrategy[] = Array.isArray(refetchStrategies) ? refetchStrategies : [refetchStrategies];
-    return strategies.map(strategy => strategy?.refetchFn().pipe(
-      strategy.refetchFn() instanceof BehaviorSubject ? skip(1) : pipe(),
-    )).filter(Boolean);
+    return strategies
+      .map(strategy => {
+        if (!strategy) return null;
+        const refetchObservable = strategy.refetchFn();
+        return refetchObservable;
+      })
+      .filter((obs): obs is Observable<any> => obs !== null);
 
 }
 
