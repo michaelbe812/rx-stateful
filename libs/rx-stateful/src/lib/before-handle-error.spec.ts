@@ -24,14 +24,14 @@ describe('beforeHandleErrorFn invocation count', () => {
     test('should call beforeHandleErrorFn exactly once per error in lazy signature', () => {
       const error = new Error('test error');
 
-      const result = subscribeSpyTo(
-        rxRequest({
-          requestFn: () => throwError(() => error),
-          config: {
-            beforeHandleErrorFn,
-          },
-        }).value$()
-      );
+      const request = rxRequest({
+        requestFn: () => throwError(() => error),
+        config: {
+          beforeHandleErrorFn,
+        },
+      });
+
+      const result = subscribeSpyTo(request.value$());
 
       expect(beforeHandleErrorFn).toHaveBeenCalledWith(error);
       expect(beforeHandleErrorFn).toHaveBeenCalledTimes(1);
@@ -40,9 +40,7 @@ describe('beforeHandleErrorFn invocation count', () => {
       expect(lastValue?.error).toBe(error);
     });
 
-    test('should call beforeHandleErrorFn for callback signature (currently calls twice - bug)', () => {
-      // TODO: There's a bug where beforeHandleErrorFn is called twice for callback signature.
-      // This test documents the current behavior. Once fixed, it should expect 1 call.
+    test('should call beforeHandleErrorFn exactly once per error in callback signature', () => {
       const trigger$ = new Subject<number>();
       const error = new Error('test error');
 
@@ -59,8 +57,7 @@ describe('beforeHandleErrorFn invocation count', () => {
       trigger$.next(1);
 
       expect(beforeHandleErrorFn).toHaveBeenCalledWith(error);
-      // Currently called twice due to bug - should be 1
-      expect(beforeHandleErrorFn).toHaveBeenCalledTimes(2);
+      expect(beforeHandleErrorFn).toHaveBeenCalledTimes(1);
       expect(result.getLastValue()?.hasError).toBe(true);
       expect(result.getLastValue()?.error).toBe(error);
     });
@@ -87,7 +84,7 @@ describe('beforeHandleErrorFn invocation count', () => {
   });
 
   describe('Multiple error scenarios', () => {
-    test('should call beforeHandleErrorFn for distinct errors (currently affected by duplication bug)', () => {
+    test('should call beforeHandleErrorFn once per distinct error', () => {
       const trigger$ = new Subject<number>();
       const error1 = new Error('error 1');
       const error2 = new Error('error 2');
@@ -107,14 +104,12 @@ describe('beforeHandleErrorFn invocation count', () => {
       );
 
       trigger$.next(1);
-      // Due to bug, called twice per error in callback signature
-      expect(beforeHandleErrorFn).toHaveBeenCalledTimes(2);
+      expect(beforeHandleErrorFn).toHaveBeenCalledTimes(1);
       expect(beforeHandleErrorFn).toHaveBeenCalledWith(error1);
 
       trigger$.next(2);
-      // Due to bug, called twice per error (2 errors = 4 calls)
-      expect(beforeHandleErrorFn).toHaveBeenCalledTimes(4);
-      expect(beforeHandleErrorFn).toHaveBeenCalledWith(error2);
+      expect(beforeHandleErrorFn).toHaveBeenCalledTimes(2);
+      expect(beforeHandleErrorFn).toHaveBeenNthCalledWith(2, error2);
     });
 
     test('should handle rapid successive errors correctly', () => {
@@ -136,9 +131,8 @@ describe('beforeHandleErrorFn invocation count', () => {
       trigger$.next(2);
       trigger$.next(3);
 
-      // Due to switch operator, only the last trigger completes
-      // But due to bug, it's called twice
-      expect(beforeHandleErrorFn).toHaveBeenCalledTimes(2);
+      // Each trigger starts an error before being switched
+      expect(beforeHandleErrorFn).toHaveBeenCalledTimes(3);
       expect(beforeHandleErrorFn).toHaveBeenCalledWith(error);
     });
 
@@ -211,15 +205,14 @@ describe('beforeHandleErrorFn invocation count', () => {
 
       // Initial trigger
       trigger$.next(1);
-      // Due to bug, called twice for callback signature
-      expect(beforeHandleErrorFn).toHaveBeenCalledTimes(2);
+      expect(beforeHandleErrorFn).toHaveBeenCalledTimes(1);
 
       // Concurrent refresh and trigger
       refresh$.next();
       trigger$.next(2);
 
-      // Due to bug and switch operator behavior
-      expect(beforeHandleErrorFn).toHaveBeenCalledTimes(4);
+      // Should handle both errors (initial + refresh + new trigger)
+      expect(beforeHandleErrorFn).toHaveBeenCalledTimes(3);
     });
 
     test('should call beforeHandleErrorFn with keepErrorOnRefresh', () => {

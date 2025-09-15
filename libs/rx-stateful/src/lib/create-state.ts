@@ -60,11 +60,11 @@ export function createState$<T, A, E>(
         (arg) =>
           sourceOrSourceFn$(arg).pipe(
             map((v) => mapToValue(v)),
-            deriveInitialValue<T, E>(mergedConfig)
+            deriveInitialValue<T, E>(mergedConfig),
+            catchError((error: E) => handleError<T, E>(error, mergedConfig, error$$))
           )
       ),
-      shareWithReplay(),
-      catchError((error: E) => handleError<T, E>(error, mergedConfig, error$$))
+      shareWithReplay()
     );
 
     const refreshTrigger$ = merge(...mergeRefetchStrategies(mergedConfig?.refetchStrategies));
