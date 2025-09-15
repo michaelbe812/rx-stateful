@@ -49,6 +49,76 @@ describe(rxRequest.name, () => {
       // test('underlying source$ should be multicasted', () => {
       //
       // });
+
+      test('should set hasValue true when value is 0', () => {
+        runWithTestScheduler(({ expectObservable }) => {
+          const source$ = rxRequest({
+            requestFn: () => of(0),
+            config: defaultConfig,
+          });
+          const expected = 's';
+          expectObservable(source$.value$()).toBe(
+            expected,
+            marbelize({
+              s: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: 0,
+                hasValue: true,
+                isSuspense: false,
+              },
+            })
+          );
+        });
+      });
+
+      test("should set hasValue true when value is ''", () => {
+        runWithTestScheduler(({ expectObservable }) => {
+          const source$ = rxRequest({
+            requestFn: () => of(''),
+            config: defaultConfig,
+          });
+          const expected = 's';
+          expectObservable(source$.value$()).toBe(
+            expected,
+            marbelize({
+              s: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: '',
+                hasValue: true,
+                isSuspense: false,
+              },
+            })
+          );
+        });
+      });
+
+      test('should set hasValue true when value is false', () => {
+        runWithTestScheduler(({ expectObservable }) => {
+          const source$ = rxRequest({
+            requestFn: () => of(false),
+            config: defaultConfig,
+          });
+          const expected = 's';
+          expectObservable(source$.value$()).toBe(
+            expected,
+            marbelize({
+              s: {
+                hasError: false,
+                error: undefined,
+                context: 'next',
+                value: false,
+                hasValue: true,
+                isSuspense: false,
+              },
+            })
+          );
+        });
+      });
+
       describe('Using refreshTrigger', () => {
         test('should emit the correct state when using a refreshTrigger ', () => {
           runWithTestScheduler(({ expectObservable, cold }) => {
