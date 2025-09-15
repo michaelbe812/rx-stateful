@@ -1,7 +1,6 @@
 import {
   BehaviorSubject,
   catchError,
-  combineLatest,
   distinctUntilChanged,
   filter,
   isObservable,
@@ -11,16 +10,11 @@ import {
   Observable,
   of,
   race,
-  ReplaySubject,
   scan,
-  share,
   startWith,
   Subject,
   switchMap,
-  takeUntil,
   tap,
-  timer,
-  withLatestFrom,
   OperatorFunction,
 } from 'rxjs';
 import { InternalRxState, RxStatefulConfig, RxStatefulSourceTriggerConfig, RxStatefulWithError } from './types/types';
@@ -84,12 +78,12 @@ export function createState$<T, A, E>(
        * This can happen if refresh is triggered before the sourceTrigger has emitted.
        */
       switchMap(() =>
-        cachedArgument !== undefined 
+        cachedArgument !== undefined
           ? sourceOrSourceFn$(cachedArgument).pipe(
-          map((v) => mapToValue(v)),
-          deriveInitialValue<T, E>(mergedConfig),
-          catchError((error: E) => handleError<T, E>(error, mergedConfig, error$$))
-          )
+              map((v) => mapToValue(v)),
+              deriveInitialValue<T, E>(mergedConfig),
+              catchError((error: E) => handleError<T, E>(error, mergedConfig, error$$))
+            )
           : NEVER
       ),
       shareWithReplay()
@@ -169,7 +163,9 @@ export function createState$<T, A, E>(
   return of({} as InternalRxState<T>);
 }
 
-function deriveInitialValue<T, E>(mergedConfig: RxStatefulConfig<T, E>): OperatorFunction<any, Partial<InternalRxState<T, E>>> {
+function deriveInitialValue<T, E>(
+  mergedConfig: RxStatefulConfig<T, E>
+): OperatorFunction<any, Partial<InternalRxState<T, E>>> {
   // TODO for first emission set isRefreshing to false
   let value: Partial<InternalRxState<T, E>> = {
     isLoading: true,
