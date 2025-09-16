@@ -194,7 +194,7 @@ function handleError<T, E>(
   error$$: Subject<RxStatefulWithError<T, E>>
 ) {
   mergedConfig?.beforeHandleErrorFn?.(error);
-  const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => error as any);
+  const errorMappingFn = mergedConfig.errorMappingFn ?? ((error: E) => error);
   error$$.next({ error: errorMappingFn(error), context: 'error', isLoading: false, isRefreshing: false, value: null });
   return NEVER;
 }

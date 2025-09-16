@@ -1,9 +1,7 @@
-import {Observable, Subject} from 'rxjs';
-import {RxStatefulAccumulationFn} from "./accumulation-fn";
-import {RefetchStrategy} from "../refetch-strategies/refetch-strategy";
-import {Injector} from "@angular/core";
-
-
+import { Observable, Subject } from 'rxjs';
+import { RxStatefulAccumulationFn } from './accumulation-fn';
+import { RefetchStrategy } from '../refetch-strategies/refetch-strategy';
+import { Injector } from '@angular/core';
 
 /**
  * @publicApi
@@ -11,9 +9,7 @@ import {Injector} from "@angular/core";
  * @description
  * Context of the current emission.
  */
-export type RxStatefulContext =  'suspense' | 'error' | 'next';
-
-
+export type RxStatefulContext = 'suspense' | 'error' | 'next';
 
 /**
  * @publicApi
@@ -30,8 +26,10 @@ export interface RxStateful<T, E = unknown> {
   hasValue: boolean;
 }
 
-
-export type RxStatefulWithError<T, E = unknown> = Pick<InternalRxState<T, E>,  'error' | 'context' | 'isLoading' | 'isRefreshing' | 'value' >;
+export type RxStatefulWithError<T, E = unknown> = Pick<
+  InternalRxState<T, E>,
+  'error' | 'context' | 'isLoading' | 'isRefreshing' | 'value'
+>;
 
 /**
  * @internal
@@ -57,7 +55,7 @@ export interface RxStatefulConfig<T, E = unknown> {
   /**
    * One or multiple Trigger to refresh the source$.
    */
-  refetchStrategies?: RefetchStrategy[] | RefetchStrategy
+  refetchStrategies?: RefetchStrategy[] | RefetchStrategy;
   /**
    * Define if the value should be kept on refresh or reset to null
    * @default false
@@ -78,7 +76,7 @@ export interface RxStatefulConfig<T, E = unknown> {
    * Mapping function to map the error to a specific value.
    * @param error - the error which is thrown by the source$, e.g. a {@link HttpErrorResponse}.
    */
-  errorMappingFn?: (error: E) => unknown;
+  errorMappingFn?: (error: E) => E;
   /**
    * Function which is called before the error is handled.
    * @param error - the error which is thrown by the source$, e.g. a {@link HttpErrorResponse}.
@@ -107,12 +105,12 @@ export interface SourceTriggerConfig<A> {
   operator?: 'switch' | 'merge' | 'concat' | 'exhaust';
 }
 
-export type RxStatefulSourceTriggerConfig<T,A, E = unknown> = RxStatefulConfig<T, E> &{
+export type RxStatefulSourceTriggerConfig<T, A, E = unknown> = RxStatefulConfig<T, E> & {
   /**
    *
    */
-  sourceTriggerConfig: SourceTriggerConfig<A>
-}
+  sourceTriggerConfig: SourceTriggerConfig<A>;
+};
 
 /**
  * @publicApi
