@@ -11,6 +11,7 @@ stateful stream. It offers out of the box:
 - ⚡️ non-flickering loading state for great UX
 
 > [!IMPORTANT] > **Breaking Change**: The `rxStateful$` function has been removed. Please use `rxRequest` which provides the same functionality with an improved API.
+> There is a migration available  which can be executed via npx ng g @angular-kit/rx-stateful:migrate-to-rx-request.
 
 ## Installation
 
