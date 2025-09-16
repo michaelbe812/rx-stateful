@@ -25,6 +25,7 @@ import { defaultAccumulationFn } from './types/accumulation-fn';
 import { mergeRefetchStrategies } from './refetch-strategies/merge-refetch-strategies';
 import { isFunctionGuard, isSourceTriggerConfigGuard } from './types/guards';
 import { applyFlatteningOperator } from './util/apply-flattening-operator';
+import { calcStartValueForRefresh } from './util/calc-start-value-for-refresh';
 
 /**
  * @internal
@@ -166,25 +167,7 @@ export function createState$<T, A, E>(
 function deriveInitialValue<T, E>(
   mergedConfig: RxStatefulConfig<T, E>
 ): OperatorFunction<any, Partial<InternalRxState<T, E>>> {
-  // TODO for first emission set isRefreshing to false
-  let value: Partial<InternalRxState<T, E>> = {
-    isLoading: true,
-    isRefreshing: true,
-    context: 'suspense',
-  };
-  if (!mergedConfig.keepValueOnRefresh) {
-    value = {
-      ...value,
-      value: null,
-    };
-  }
-  if (!mergedConfig.keepErrorOnRefresh) {
-    value = {
-      ...value,
-      error: undefined,
-    };
-  }
-
+  const value = calcStartValueForRefresh<T, E>(mergedConfig);
   return startWith(value);
 }
 
