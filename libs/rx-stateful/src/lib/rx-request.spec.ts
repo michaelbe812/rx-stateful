@@ -14,6 +14,55 @@ function test(label: string, callback: () => void) {
 }
 
 describe(rxRequest.name, () => {
+  describe('Function Overloads Type Safety', () => {
+    test('should accept requestFn without arguments when no trigger provided', () => {
+      TestBed.runInInjectionContext(() => {
+        // This should compile without type errors
+        const request = rxRequest({
+          requestFn: () => of(42),
+          config: { suspenseTimeMs: 0, suspenseThresholdMs: 0 },
+        });
+
+        const result = subscribeSpyTo(request.value$());
+        expect(result.getLastValue()?.value).toBe(42);
+      });
+    });
+
+    test('should require requestFn with argument when trigger is provided', () => {
+      TestBed.runInInjectionContext(() => {
+        const trigger$ = new Subject<string>();
+
+        // This should compile with proper type inference
+        const request = rxRequest({
+          trigger: trigger$,
+          requestFn: (arg: string) => of(`Result: ${arg}`),
+          config: { suspenseTimeMs: 0, suspenseThresholdMs: 0 },
+        });
+
+        const result = subscribeSpyTo(request.value$());
+        trigger$.next('test');
+
+        expect(result.getLastValue()?.value).toBe('Result: test');
+      });
+    });
+
+    test('should handle Observable trigger with proper typing', () => {
+      TestBed.runInInjectionContext(() => {
+        const trigger$ = of(123);
+
+        // Type inference should work for the argument
+        const request = rxRequest({
+          trigger: trigger$,
+          requestFn: (num: number) => of(num * 2), // explicitly type the parameter
+          config: { suspenseTimeMs: 0, suspenseThresholdMs: 0 },
+        });
+
+        const result = subscribeSpyTo(request.value$());
+        expect(result.getLastValue()?.value).toBe(246);
+      });
+    });
+  });
+
   describe('non-flicker suspense not used', () => {
     const defaultConfig: RxStatefulConfig<any> = {
       suspenseTimeMs: 0,
@@ -232,7 +281,7 @@ describe(rxRequest.name, () => {
           const trigger = cold('a--b', { a: 1, b: 2 });
           const source$ = rxRequest({
             trigger,
-            requestFn: (n) => of(n),
+            requestFn: (n: number) => of(n),
             config: {
               ...defaultConfig,
             },
@@ -283,7 +332,7 @@ describe(rxRequest.name, () => {
 
           const source$ = rxRequest({
             trigger,
-            requestFn: (n) => s$(n),
+            requestFn: (n: number) => s$(n),
             config: {
               ...defaultConfig,
               refetchStrategies: [withRefetchOnTrigger(refresh)],
@@ -337,7 +386,7 @@ describe(rxRequest.name, () => {
 
           const source$ = rxRequest({
             trigger,
-            requestFn: (n) => s$(n),
+            requestFn: (n: number) => s$(n),
             config: { ...defaultConfig, keepValueOnRefresh: true, refetchStrategies: [withRefetchOnTrigger(refresh)] },
           });
 
@@ -496,7 +545,7 @@ describe(rxRequest.name, () => {
               const refresh$ = cold('---a-', { a: void 0 });
               const expected = 'sa-sa-';
 
-              const source$ = rxRequest<any, any, any>({
+              const source$ = rxRequest<any, any>({
                 requestFn: () => s$,
                 config: {
                   ...defaultConfig,
@@ -815,7 +864,7 @@ describe(rxRequest.name, () => {
 
           const source$ = rxRequest({
             trigger: trigger$,
-            requestFn: (n) => s$(n),
+            requestFn: (n: number) => s$(n),
             config: {
               ...defaultConfig,
             },
@@ -857,7 +906,7 @@ describe(rxRequest.name, () => {
 
           const source$ = rxRequest({
             trigger: trigger$,
-            requestFn: (n) => s$(n),
+            requestFn: (n: number) => s$(n),
             config: {
               ...defaultConfig,
             },
@@ -905,7 +954,7 @@ describe(rxRequest.name, () => {
           const expected = '--s---a----s---b-----';
           const source$ = rxRequest({
             trigger: trigger$,
-            requestFn: (n) => s$(n),
+            requestFn: (n: number) => s$(n),
             config: {
               ...defaultConfig,
             },
